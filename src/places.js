@@ -12,8 +12,8 @@ export const places = [
     id: "kiosk",
     name: "Kiosk",
     type: "restaurant",
-    lat: 59.34619022159751,
-    lng: 18.071320541203033,
+    lat: 59.34620529611837,
+    lng: 18.071627806665937,
     openingHours: "Öppet idag",
     rooms: []
   },
@@ -21,8 +21,8 @@ export const places = [
     id: "murad-kiosken",
     name: "Murad Kiosken",
     type: "restaurant",
-    lat: 59.346033555114026,
-    lng: 18.071556356820928,
+    lat: 59.34611629720569,
+    lng: 18.07155698772373,
     openingHours: "Öppet idag",
     rooms: []
   },
@@ -30,8 +30,8 @@ export const places = [
     id: "tekniska-tunnelbana",
     name: "Tekniska högskolan tunnelbana",
     type: "restaurant",
-    lat: 59.346033555114026,
-    lng: 18.071556356820928,
+    lat: 59.345890401292955,
+    lng: 18.07156794274578,
     openingHours: "Öppet idag",
     rooms: []
   },

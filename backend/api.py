@@ -13,6 +13,48 @@ MICROWAVES_FILE = BASE_DIR / "kth_rooms" / "rooms_microwave.json"
 PRINTERS_FILE = BASE_DIR / "kth_rooms" / "skrivare.json"
 SECTIONS_FILE = BASE_DIR / "kth_rooms" / "sections.json"
 
+ALLOWED_AREAS = [
+    {
+        "name": "KTH Campus and AlbaNova",
+        "min_lat": 59.3457,
+        "max_lat": 59.3550,
+        "min_lng": 18.0550,
+        "max_lng": 18.0760,
+    },
+]
+
+EXCLUDED_POINTS = [
+    (59.3537, 18.0576),
+]
+
+
+def is_allowed_area(lat, lng):
+    try:
+        lat = float(lat)
+        lng = float(lng)
+    except (TypeError, ValueError):
+        return False
+
+    return any(
+        area["min_lat"] <= lat <= area["max_lat"]
+        and area["min_lng"] <= lng <= area["max_lng"]
+        for area in ALLOWED_AREAS
+    )
+
+
+def is_excluded_point(lat, lng):
+    try:
+        lat = float(lat)
+        lng = float(lng)
+    except (TypeError, ValueError):
+        return False
+
+    return any(
+        abs(lat - excluded_lat) < 0.000001
+        and abs(lng - excluded_lng) < 0.000001
+        for excluded_lat, excluded_lng in EXCLUDED_POINTS
+    )
+
 
 def load_json(path):
     with open(path, "r", encoding="utf-8") as f:
@@ -164,6 +206,9 @@ def build_places():
         if building_id is None or lat is None or lng is None:
             continue
 
+        if not is_allowed_area(lat, lng) or is_excluded_point(lat, lng):
+            continue
+
         place_key = str(building_id)
         room_name, address = split_room_name_and_address(room.get("name", ""))
 
@@ -201,6 +246,12 @@ def build_places():
     restaurants = load_json(RESTAURANTS_FILE)
 
     for restaurant in restaurants:
+        if (
+            not is_allowed_area(restaurant.get("lat"), restaurant.get("lng"))
+            or is_excluded_point(restaurant.get("lat"), restaurant.get("lng"))
+        ):
+            continue
+
         restaurant["rooms"] = []
         restaurant["addresses"] = []
         restaurant["searchText"] = " ".join(

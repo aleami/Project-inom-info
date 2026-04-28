@@ -6,9 +6,9 @@ import {
   Marker,
   Popup,
   useMap,
+  useMapEvents,
 } from "react-leaflet";
 
-import microwaveIconImg from "./microwave.png";
 import braziliaLogo from "./brazilia-logo.png";
 import thsLogo from "./ths-logo.png";
 import slLogo from "./sl-logo.png";
@@ -16,6 +16,11 @@ import sevenElevenLogo from "./seven-eleven-logo.png";
 import laCampusLogo from "./la-campus-logo.png";
 import systerOBrorLogo from "./syster-o-bror-logo.png";
 import kioskLogo from "./kiosk-logo.png";
+
+const MAP_BOUNDS = [
+  [59.31, 17.96],
+  [59.39, 18.12],
+];
 
 function createBuildingIcon() {
   return L.divIcon({
@@ -33,15 +38,6 @@ function createBuildingIcon() {
     iconSize: [22, 22],
     iconAnchor: [11, 11],
     popupAnchor: [0, -12],
-  });
-}
-
-function createMicrowaveIcon() {
-  return L.icon({
-    iconUrl: microwaveIconImg,
-    iconSize: [38, 38],
-    iconAnchor: [19, 19],
-    popupAnchor: [0, -16],
   });
 }
 
@@ -83,16 +79,35 @@ function createRestaurantLogoIcon(place) {
 
   if (!iconUrl) return createRestaurantIcon();
 
-  return L.icon({
-    iconUrl,
-    iconSize: [40, 40],
-    iconAnchor: [20, 20],
-    popupAnchor: [0, -18],
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        width: 46px;
+        height: 46px;
+        background: rgba(255,255,255,0.96);
+        border: 2px solid white;
+        border-radius: 999px;
+        box-shadow: 0 8px 20px rgba(15,23,42,0.20);
+        overflow: visible;
+        position: relative;
+      ">
+        <img src="${iconUrl}" alt="" style="
+          width: 34px;
+          height: 34px;
+          object-fit: contain;
+          display: block;
+          position: absolute;
+          left: 50%;
+          top: 50%;
+          transform: translate(-50%, -50%);
+        " />
+      </div>
+    `,
+    iconSize: [46, 46],
+    iconAnchor: [23, 23],
+    popupAnchor: [0, -20],
   });
-}
-
-function getMicrowaveMarkerPosition(place) {
-  return [place.lat + 0.00012, place.lng + 0.00012];
 }
 
 function isRestaurant(place) {
@@ -112,6 +127,19 @@ function FlyToSelected({ places, selectedBuildingId }) {
       duration: 1.2,
     });
   }, [map, places, selectedBuildingId]);
+
+  return null;
+}
+
+function KeepPopupSizedAfterZoom() {
+  useMapEvents({
+    zoomend(event) {
+      event.target._popup?.update();
+    },
+    resize(event) {
+      event.target._popup?.update();
+    },
+  });
 
   return null;
 }
@@ -269,7 +297,6 @@ export default function CampusMap({
   selectedBuildingId,
   onSelectBuilding,
 }) {
-  const microwaveIcon = createMicrowaveIcon();
   const buildingIcon = createBuildingIcon();
 
   return (
@@ -282,6 +309,11 @@ export default function CampusMap({
       <MapContainer
         center={[59.3493, 18.0712]}
         zoom={16}
+        minZoom={13}
+        keyboard={false}
+        closePopupOnClick={false}
+        maxBounds={MAP_BOUNDS}
+        maxBoundsViscosity={0.8}
         style={{
           height: "82vh",
           width: "100%",
@@ -296,6 +328,7 @@ export default function CampusMap({
           places={places}
           selectedBuildingId={selectedBuildingId}
         />
+        <KeepPopupSizedAfterZoom />
 
         {places.map((place) => {
           const restaurant = isRestaurant(place);
@@ -313,11 +346,22 @@ export default function CampusMap({
                 click: () => onSelectBuilding(place.id),
               }}
             >
-              <Popup>
+              <Popup
+                minWidth={240}
+                maxWidth={300}
+                closeOnClick={false}
+                keepInView
+                autoPan
+                autoPanPadding={[18, 18]}
+              >
                 <div
                   style={{
-                    minWidth: "250px",
+                    width: "min(280px, calc(100vw - 64px))",
+                    maxHeight: "min(52vh, 360px)",
+                    overflowY: "auto",
+                    overflowX: "hidden",
                     fontFamily: "system-ui, sans-serif",
+                    paddingRight: "1px",
                   }}
                 >
                   <div
@@ -325,7 +369,8 @@ export default function CampusMap({
                       fontSize: "22px",
                       fontWeight: 800,
                       color: "#1e3a8a",
-                      marginBottom: "8px",
+                      marginBottom: "6px",
+                      lineHeight: 1.15,
                     }}
                   >
                     {place.name}
@@ -336,7 +381,7 @@ export default function CampusMap({
                       style={{
                         fontSize: "14px",
                         color: "#475569",
-                        marginBottom: "10px",
+                        marginBottom: "8px",
                       }}
                     >
                       <strong>Öppettider:</strong> {place.openingHours}
@@ -350,7 +395,7 @@ export default function CampusMap({
                       style={{
                         fontSize: "14px",
                         color: "#004791",
-                        marginBottom: "10px",
+                        marginBottom: "8px",
                         fontWeight: 700,
                       }}
                     >
@@ -362,9 +407,7 @@ export default function CampusMap({
                     <div
                       style={{
                         display: "grid",
-                        gap: "8px",
-                        maxHeight: "240px",
-                        overflowY: "auto",
+                        gap: "6px",
                       }}
                     >
                       {place.rooms.map((room) => (
@@ -372,8 +415,8 @@ export default function CampusMap({
                           key={room.id}
                           style={{
                             border: "1px solid #dbeafe",
-                            borderRadius: "14px",
-                            padding: "10px 12px",
+                            borderRadius: "10px",
+                            padding: "8px 10px",
                             background: "#f8fbff",
                           }}
                         >
@@ -426,75 +469,23 @@ export default function CampusMap({
                       Visar {place.rooms.length} av {place.roomCount} rum.
                     </div>
                   )}
-                </div>
-              </Popup>
-            </Marker>
-          );
-        })}
 
-        {places
-          .filter((place) => !isRestaurant(place) && place.microwaves)
-          .map((place) => (
-            <Marker
-              key={`${place.id}-microwave`}
-              position={getMicrowaveMarkerPosition(place)}
-              icon={microwaveIcon}
-            >
-              <Popup>
-                <div
-                  style={{
-                    minWidth: "220px",
-                    fontFamily: "system-ui, sans-serif",
-                  }}
-                >
-                  <div
-                    style={{
-                      fontSize: "20px",
-                      fontWeight: 800,
-                      color: "#1e3a8a",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    {place.name} · Mikrovågsugnar
-                  </div>
-
-                  <div
-                    style={{
-                      fontSize: "14px",
-                      color: "#475569",
-                      marginBottom: "8px",
-                    }}
-                  >
-                    <strong>Antal:</strong> {place.microwaves.count}
-                  </div>
-
-                  {place.microwaves.locations && (
+                  {!restaurant && place.roomCount === (place.rooms || []).length && (
                     <div
                       style={{
-                        display: "grid",
-                        gap: "6px",
+                        fontSize: "12px",
+                        color: "#64748b",
+                        marginTop: "8px",
                       }}
                     >
-                      {place.microwaves.locations.map((location, index) => (
-                        <div
-                          key={`${place.id}-mw-${index}`}
-                          style={{
-                            fontSize: "13px",
-                            color: "#475569",
-                          }}
-                        >
-                          <RoomLink href={location.mapsUrl}>
-                            {location.name}
-                          </RoomLink>
-                          {location.address ? `, ${location.address}` : ""}
-                        </div>
-                      ))}
+                      Visar alla {place.rooms.length} rum.
                     </div>
                   )}
                 </div>
               </Popup>
             </Marker>
-          ))}
+          );
+        })}
       </MapContainer>
     </div>
   );
