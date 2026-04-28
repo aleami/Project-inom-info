@@ -1,0 +1,66 @@
+[
+  {
+    "id": "7eleven",
+    "name": "7 Eleven",
+    "type": "restaurant",
+    "lat": 59.346404452787205,
+    "lng": 18.071679216115548,
+    "openingHours": "Öppet idag"
+  },
+  {
+    "id": "kiosk",
+    "name": "Kiosk",
+    "type": "restaurant",
+    "lat": 59.34619022159751,
+    "lng": 18.071320541203033,
+    "openingHours": "Öppet idag"
+  },
+  {
+    "id": "murad-kiosken",
+    "name": "Murad Kiosken",
+    "type": "restaurant",
+    "lat": 59.346033555114026,
+    "lng": 18.071556356820928,
+    "openingHours": "Öppet idag"
+  },
+  {
+  "id": "tekniska-tunnelbana",
+  "name": "Tekniska högskolan tunnelbana",
+  "type": "restaurant",
+  "lat": 59.34612,
+  "lng": 18.07192,
+  "openingHours": "Öppet idag"
+},
+  {
+    "id": "la-campus",
+    "name": "La Campus",
+    "type": "restaurant",
+    "lat": 59.346768293136165,
+    "lng": 18.071693709913998,
+    "openingHours": "Öppet idag"
+  },
+  {
+    "id": "syster-o-bror",
+    "name": "Syster O Bror",
+    "type": "restaurant",
+    "lat": 59.34825208198007,
+    "lng": 18.070914739366792,
+    "openingHours": "Öppet idag"
+  },
+  {
+    "id": "brazilia",
+    "name": "Brazilia",
+    "type": "restaurant",
+    "lat": 59.3533,
+    "lng": 18.0653,
+    "openingHours": "Mån–Fre 10:30–14:00"
+  },
+  {
+    "id": "nymble",
+    "name": "Nymble",
+    "type": "restaurant",
+    "lat": 59.34711033005638,
+    "lng": 18.071263528835843,
+    "openingHours": "Mån–Fre 11:30–14:00"
+  }
+]

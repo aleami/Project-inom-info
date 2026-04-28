@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Karta - CampusFinder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap">
+    <!-- Leaflet from CDN instead of node_modules -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/karta.css">
+</head>
+
+<body>
+
+<header>
+    <a href="home.html" class="logo">
+        <div class="logo-icon"><img src="../images/logo.png" alt="CampusFinder logo"></div>
+        <span>CampusFinder</span>
+    </a>
+
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="karta.html" class="active">Map</a>
+        <a href="restaurang.html">Restaurants</a>
+        <a href="about.html" >About</a>
+        <a href="grupprum.html" class="cta">Book a Study Room</a>
+    </nav>
+</header>
+
+<div class="search-container">
+    <div class="search-row">
+        <div class="search-box" id="searchBox">
+            <input id="searchInput" type="text" placeholder="Search buildings, sections, microwaves, or printers...">
+            <span class="close-icon" id="clearSearchButton">x</span>
+            <button id="searchButton" type="button">Search</button>
+            <div id="resultsDropdown" class="results-dropdown"></div>
+        </div>
+        <button id="locateButton" class="locate-button" type="button">My location</button>
+    </div>
+
+    <div id="statusMessage" class="status-message">Loading campus data...</div>
+    <div id="routeMessage" class="route-message">Select a building to see a walking trail.</div>
+
+    <div id="highlightsPanel" class="highlights-panel">
+        <div class="highlights-panel-header">
+            <h2>Highlights nearby</h2>
+            <span id="highlightsMeta">Waiting for location...</span>
+        </div>
+        <div id="highlightsList" class="highlights-list">
+            <div class="highlight-item muted">Allow location access to see distances to all places.</div>
+        </div>
+    </div>
+</div>
+
+<div class="map-container">
+    <div id="campusMap"></div>
+</div>
+
+<!-- Leaflet JS from CDN -->
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+    // ── Inlined distance.js functions ──────────────────────────────────────
+    function calculateDistanceInMeters(lat1, lng1, lat2, lng2) {
+        const R = 6371000;
+        const toRad = deg => deg * Math.PI / 180;
+        const dLat = toRad(lat2 - lat1);
+        const dLng = toRad(lng2 - lng1);
+        const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+                  Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) *
+                  Math.sin(dLng/2) * Math.sin(dLng/2);
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+
+    function formatDistance(meters) {
+        if (meters == null) return '';
+        if (meters < 1000) return `${Math.round(meters)} m`;
+        return `${(meters / 1000).toFixed(1)} km`;
+    }
+
+    function requestUserLocation() {
+        return new Promise((resolve, reject) => {
+            if (!navigator.geolocation) {
+                reject(new Error('Geolocation is not supported by your browser.'));
+                return;
+            }
+            navigator.geolocation.getCurrentPosition(
+                pos => resolve({
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy
+                }),
+                err => reject(new Error('Could not get your location: ' + err.message))
+            );
+        });
+    }
+    // ───────────────────────────────────────────────────────────────────────
+
+    const pageParams = new URLSearchParams(window.location.search);
+    const isPreviewMode = pageParams.get('preview') === '1';
+    if (isPreviewMode) {
+        document.body.classList.add('preview-mode');
+    }
+
+    const API_URL = '../data/places.json';
+    const input = document.getElementById('searchInput');
+    const box = document.getElementById('searchBox');
+    const dropdown = document.getElementById('resultsDropdown');
+    const statusMessage = document.getElementById('statusMessage');
+    const searchButton = document.getElementById('searchButton');
+    const clearSearchButton = document.getElementById('clearSearchButton');
+    const locateButton = document.getElementById('locateButton');
+    const highlightsList = document.getElementById('highlightsList');
+    const highlightsMeta = document.getElementById('highlightsMeta');
+    const routeMessage = document.getElementById('routeMessage');
+
+    let places = [];
+    let buildingMarkers = [];
+    let microwaveMarkers = [];
+    let sectionMarkers = [];
+    let userLocation = null;
+    let userMarker = null;
+    let userAccuracyCircle = null;
+    let activeRoute = null;
+    let activeDestinationId = null;
+
+    const CAMPUS_PATH_NODES = {
+        southWestGate: [59.34772, 18.07162],
+        southPlaza: [59.34788, 18.07218],
+        centerSouth: [59.34802, 18.07296],
+        centerMid: [59.34842, 18.07302],
+        eastMid: [59.34846, 18.07392],
+        northEast: [59.34936, 18.07378],
+        northMid: [59.34940, 18.07296],
+        northWest: [59.34934, 18.07198],
+        westMid: [59.34886, 18.07194],
+        westSouth: [59.34834, 18.07188],
+        libraryLink: [59.34798, 18.07314]
+    };
+
+    const CAMPUS_PATH_EDGES = [
+        ['southWestGate', 'southPlaza'],
+        ['southPlaza', 'centerSouth'],
+        ['centerSouth', 'centerMid'],
+        ['centerMid', 'eastMid'],
+        ['eastMid', 'northEast'],
+        ['northEast', 'northMid'],
+        ['northMid', 'northWest'],
+        ['northWest', 'westMid'],
+        ['westMid', 'westSouth'],
+        ['westSouth', 'southWestGate'],
+        ['westSouth', 'centerSouth'],
+        ['centerMid', 'northMid'],
+        ['centerSouth', 'libraryLink'],
+        ['libraryLink', 'centerMid'],
+        ['libraryLink', 'southPlaza']
+    ];
+
+    const map = L.map('campusMap').setView([59.3493, 18.0712], 16);
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+        attribution: '&copy; OpenStreetMap contributors & CartoDB',
+        maxZoom: 20
+    }).addTo(map);
+
+    const buildingIcon = L.divIcon({
+        className: '',
+        html: '<div class="building-marker"></div>',
+        iconSize: [22, 22],
+        iconAnchor: [11, 11],
+        popupAnchor: [0, -12]
+    });
+
+    const microwaveIcon = L.divIcon({
+        className: '',
+        html: '<div class="microwave-marker">M</div>',
+        iconSize: [28, 28],
+        iconAnchor: [14, 14],
+        popupAnchor: [0, -14]
+    });
+
+    function getSectionIcon(section) {
+        if (section.logoUrl) {
+            return L.icon({
+                iconUrl: section.logoUrl,
+                iconSize: [34, 34],
+                iconAnchor: [17, 17],
+                popupAnchor: [0, -16]
+            });
+        }
+        return L.divIcon({
+            className: '',
+            html: `<div class="section-marker">${escapeHtml(section.logoText || section.shortName || 'SEC')}</div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor: [0, -16]
+        });
+    }
+
+    const restaurantLogos = {
+        '7eleven': '../images/seven-eleven-logo.png',
+        'kiosk': '../images/kiosk.png',
+        'murad-kiosken': '../images/kiosk.png',
+        'tekniska-tunnelbana': '../images/sl.gif',
+        'la-campus': '../images/la-campus-logo.png',
+        'syster-o-bror': '../images/syster-o-bror-logo.png',
+        'brazilia': '../images/logo_brazilia.png',
+        'nymble': '../images/nymble.jpg'
+    };
+
+    const restaurantLinks = {
+        'nymble': {
+            menu: 'https://nymble.gastrogate.com/lunch/',
+            website: 'https://ths.kth.se/studentliv/nymble'
+        },
+        'brazilia': {
+            menu: 'https://www.restaurangbrazilia.se/meny/lunch/',
+            website: 'https://www.restaurangbrazilia.se/'
+        },
+        '7eleven': { website: 'https://www.7-eleven.se/' },
+        'tekniska-tunnelbana': { website: 'https://sl.se/' },
+        'syster-o-bror': { website: 'https://systerobror.se/' },
+        'la-campus': { website: 'https://www.lacampus.se/' }
+    };
+
+    function isRestaurant(place) {
+        return place.type === 'restaurant';
+    }
+
+    function getRestaurantIcon(place) {
+        const logo = restaurantLogos[place.id];
+        if (!logo) {
+            return L.divIcon({
+                className: '',
+                html: '<div class="restaurant-marker">R</div>',
+                iconSize: [36, 36],
+                iconAnchor: [18, 18],
+                popupAnchor: [0, -16]
+            });
+        }
+        return L.icon({
+            iconUrl: logo,
+            iconSize: [42, 42],
+            iconAnchor: [21, 21],
+            popupAnchor: [0, -18]
+        });
+    }
+
+    function normalizeSearchText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase();
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function getDistanceForPlace(place) {
+        if (!userLocation) return null;
+        return calculateDistanceInMeters(
+            userLocation.latitude, userLocation.longitude,
+            place.lat, place.lng
+        );
+    }
+
+    function getPlaceSearchText(place) {
+        return normalizeSearchText([
+            place.name,
+            place.searchText,
+            ...(place.addresses || []),
+            ...(place.rooms || []).flatMap(room => [room.name, room.address, room.buildingName]),
+            ...((place.microwaves && place.microwaves.locations) || []).flatMap(l => [l.name, l.address]),
+            ...((place.printers && place.printers.locations) || []).flatMap(l => [l.name, l.address]),
+            ...(place.sections || []).flatMap(s => [s.name, s.shortName, s.buildingName, s.description])
+        ].join(' '));
+    }
+
+    function getPopupHtml(place) {
+        const distanceInMeters = getDistanceForPlace(place);
+
+        if (isRestaurant(place)) {
+            const logo = restaurantLogos[place.id];
+            const links = restaurantLinks[place.id] || {};
+            return `
+                <div class="map-popup restaurant-popup">
+                    <h3>${escapeHtml(place.name)}</h3>
+                    ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
+                    ${place.openingHours ? `<p><strong>Open:</strong> ${escapeHtml(place.openingHours)}</p>` : ''}
+                    ${logo ? `<img src="${logo}" alt="${escapeHtml(place.name)}" style="max-width:90px;max-height:70px;object-fit:contain;margin:8px auto;display:block;">` : ''}
+                    ${links.menu ? `<a href="${escapeHtml(links.menu)}" target="_blank" rel="noreferrer">Open menu</a>` : ''}
+                    ${links.website ? `<a href="${escapeHtml(links.website)}" target="_blank" rel="noreferrer">Open website</a>` : ''}
+                </div>
+            `;
+        }
+
+        const rooms = (place.rooms || []).slice(0, 8);
+        const addresses = (place.addresses || []).slice(0, 3).join(', ');
+        const sections = (place.sections || []).slice(0, 5);
+        const roomRows = rooms.map(room => `
+            <li>
+                ${room.mapsUrl ? `<a href="${escapeHtml(room.mapsUrl)}" target="_blank" rel="noreferrer">${escapeHtml(room.name)}</a>` : escapeHtml(room.name)}
+                ${room.address ? `<span>${escapeHtml(room.address)}</span>` : ''}
+            </li>
+        `).join('');
+        const sectionRows = sections.map(section => `
+            <li class="popup-section-row">
+                <span class="popup-section-badge">${escapeHtml(section.logoText || section.shortName || 'SEC')}</span>
+                <div>
+                    <strong>${escapeHtml(section.name)}</strong>
+                    ${section.description ? `<span>${escapeHtml(section.description)}</span>` : ''}
+                </div>
+            </li>
+        `).join('');
+
+        return `
+            <div class="map-popup">
+                <h3>${escapeHtml(place.name)}</h3>
+                ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
+                <p>${place.roomCount || (place.rooms || []).length} rooms in backend data</p>
+                ${addresses ? `<p class="popup-address">${escapeHtml(addresses)}</p>` : ''}
+                ${place.sections ? `<p class="popup-feature"><span class="popup-feature-icon">🏠</span>${place.sections.length} section spaces</p>` : ''}
+                ${place.microwaves ? `<p class="popup-feature"><span class="popup-feature-icon">♨</span>${place.microwaves.count} microwaves</p>` : ''}
+                ${place.printers ? `<p class="popup-feature"><span class="popup-feature-icon">🖨</span>${place.printers.count} printers</p>` : ''}
+                ${sectionRows ? `<ul class="popup-sections-list">${sectionRows}</ul>` : ''}
+                ${roomRows ? `<ul>${roomRows}</ul>` : ''}
+                ${place.roomCount > (place.rooms || []).length ? `<small>Showing ${(place.rooms || []).length} of ${place.roomCount} rooms.</small>` : ''}
+            </div>
+        `;
+    }
+
+    function updateHighlightsPanel() {
+        if (!places.length) {
+            highlightsList.innerHTML = '<div class="highlight-item muted">No highlights loaded yet.</div>';
+            highlightsMeta.textContent = 'Loading...';
+            return;
+        }
+        if (!userLocation) {
+            highlightsList.innerHTML = '<div class="highlight-item muted">Allow location access to see distances to all places.</div>';
+            highlightsMeta.textContent = `${places.length} places`;
+            return;
+        }
+        const sortedPlaces = [...places]
+            .map(place => ({ ...place, distanceInMeters: getDistanceForPlace(place) }))
+            .sort((a, b) => a.distanceInMeters - b.distanceInMeters);
+
+        highlightsMeta.textContent = `${sortedPlaces.length} places sorted by distance`;
+        highlightsList.innerHTML = sortedPlaces.map(place => `
+            <button class="highlight-item" type="button" data-place-id="${escapeHtml(place.id)}">
+                <strong>${escapeHtml(place.name)}</strong>
+                <span>${formatDistance(place.distanceInMeters)}</span>
+            </button>
+        `).join('');
+
+        highlightsList.querySelectorAll('.highlight-item[data-place-id]').forEach(item => {
+            item.addEventListener('click', () => {
+                const place = places.find(entry => entry.id === item.dataset.placeId);
+                if (place) selectPlace(place);
+            });
+        });
+    }
+
+    function clearRoute() {
+        activeDestinationId = null;
+        if (activeRoute) { activeRoute.remove(); activeRoute = null; }
+    }
+
+    function drawRouteLine(latLngs, options = {}) {
+        if (activeRoute) activeRoute.remove();
+        activeRoute = L.polyline(latLngs, {
+            color: options.color || '#16a34a',
+            weight: options.weight || 6,
+            opacity: options.opacity || 0.9,
+            lineCap: 'round',
+            lineJoin: 'round',
+            dashArray: options.dashArray || '10 8'
+        }).addTo(map);
+        map.fitBounds(L.latLngBounds(latLngs), { padding: [60, 60], maxZoom: 18 });
+    }
+
+    function formatWalkingTime(seconds) {
+        const minutes = Math.max(1, Math.round(seconds / 60));
+        if (minutes < 60) return `${minutes} min walk`;
+        const hours = Math.floor(minutes / 60);
+        const rem = minutes % 60;
+        return rem ? `${hours} h ${rem} min walk` : `${hours} h walk`;
+    }
+
+    function getNearestCampusNodeId(point) {
+        return Object.entries(CAMPUS_PATH_NODES)
+            .map(([nodeId, nodePoint]) => ({
+                nodeId,
+                distance: calculateDistanceInMeters(point[0], point[1], nodePoint[0], nodePoint[1])
+            }))
+            .sort((a, b) => a.distance - b.distance)[0];
+    }
+
+    function createCampusGraph() {
+        const graph = new Map();
+        const graphPoints = { ...CAMPUS_PATH_NODES };
+
+        function ensureNode(id) { if (!graph.has(id)) graph.set(id, []); }
+        function addEdge(fromId, toId) {
+            const fp = graphPoints[fromId], tp = graphPoints[toId];
+            const distance = calculateDistanceInMeters(fp[0], fp[1], tp[0], tp[1]);
+            ensureNode(fromId); ensureNode(toId);
+            graph.get(fromId).push({ to: toId, distance });
+            graph.get(toId).push({ to: fromId, distance });
+        }
+
+        Object.keys(graphPoints).forEach(ensureNode);
+        CAMPUS_PATH_EDGES.forEach(([a, b]) => addEdge(a, b));
+        return { graph, graphPoints };
+    }
+
+    function findShortestCampusPath(startPoint, endPoint) {
+        const startNode = getNearestCampusNodeId(startPoint);
+        const endNode = getNearestCampusNodeId(endPoint);
+        if (!startNode || !endNode) return null;
+
+        const { graph, graphPoints } = createCampusGraph();
+        const distances = new Map();
+        const previous = new Map();
+        const unvisited = new Set(graph.keys());
+
+        graph.forEach((_, nodeId) => distances.set(nodeId, Infinity));
+        distances.set(startNode.nodeId, 0);
+
+        while (unvisited.size) {
+            let currentNode = null, bestDistance = Infinity;
+            unvisited.forEach(nodeId => {
+                const d = distances.get(nodeId);
+                if (d < bestDistance) { bestDistance = d; currentNode = nodeId; }
+            });
+            if (!currentNode || currentNode === endNode.nodeId) break;
+            unvisited.delete(currentNode);
+            for (const edge of graph.get(currentNode)) {
+                if (!unvisited.has(edge.to)) continue;
+                const alt = distances.get(currentNode) + edge.distance;
+                if (alt < distances.get(edge.to)) {
+                    distances.set(edge.to, alt);
+                    previous.set(edge.to, currentNode);
+                }
+            }
+        }
+
+        const pathIds = [];
+        let current = endNode.nodeId;
+        while (current) {
+            pathIds.unshift(current);
+            current = previous.get(current);
+            if (current === startNode.nodeId) { pathIds.unshift(current); break; }
+        }
+        if (pathIds[0] !== startNode.nodeId || pathIds[pathIds.length - 1] !== endNode.nodeId) return null;
+
+        const latLngs = pathIds.map(nodeId => graphPoints[nodeId]);
+        let totalDistance = 0;
+        for (let i = 1; i < latLngs.length; i++) {
+            totalDistance += calculateDistanceInMeters(latLngs[i-1][0], latLngs[i-1][1], latLngs[i][0], latLngs[i][1]);
+        }
+        return { latLngs, distance: totalDistance, startOffset: startNode.distance, endOffset: endNode.distance, startNodeId: startNode.nodeId, endNodeId: endNode.nodeId };
+    }
+
+    async function drawWalkingRoute(place) {
+        if (!userLocation) {
+            routeMessage.textContent = 'Click My location first to calculate a walking trail.';
+            clearRoute();
+            return;
+        }
+        routeMessage.textContent = `Calculating walking trail to ${place.name}...`;
+        activeDestinationId = place.id;
+        try {
+            const startPoint = [userLocation.latitude, userLocation.longitude];
+            const endPoint = [place.lat, place.lng];
+            const route = findShortestCampusPath(startPoint, endPoint);
+            if (!route) throw new Error('No campus path was found.');
+            if (activeDestinationId !== place.id) return;
+            clearRoute();
+            activeDestinationId = place.id;
+            drawRouteLine(route.latLngs, { color: '#16a34a', weight: 6, opacity: 0.9, dashArray: '10 8' });
+            const estimatedDurationSeconds = route.distance / 1.35;
+            const offsetNote = route.endOffset > 18 ? ` | nearest walkway ${formatDistance(route.endOffset)} away` : '';
+            routeMessage.textContent = `${place.name}: ${formatDistance(route.distance)} | ${formatWalkingTime(estimatedDurationSeconds)} | campus trail${offsetNote}`;
+        } catch (error) {
+            clearRoute();
+            routeMessage.textContent = `Could not find a campus trail to ${place.name}.`;
+            console.error(error);
+        }
+    }
+
+    function addPlacesToMap() {
+        buildingMarkers.forEach(m => m.remove());
+        microwaveMarkers.forEach(m => m.remove());
+        sectionMarkers.forEach(m => m.remove());
+        buildingMarkers = []; microwaveMarkers = []; sectionMarkers = [];
+
+        places.forEach(place => {
+            const markerIcon = isRestaurant(place) ? getRestaurantIcon(place) : buildingIcon;
+            const marker = L.marker([place.lat, place.lng], { icon: markerIcon })
+                .addTo(map)
+                .bindPopup(getPopupHtml(place));
+            marker.on('click', () => selectPlace(place));
+            buildingMarkers.push(marker);
+
+            if (!isRestaurant(place) && place.microwaves) {
+                const microwaveMarker = L.marker([place.lat + 0.00012, place.lng + 0.00012], { icon: microwaveIcon })
+                    .addTo(map)
+                    .bindPopup(`
+                        <div class="map-popup">
+                            <h3>${escapeHtml(place.name)} - microwaves</h3>
+                            <p>Count: ${place.microwaves.count}</p>
+                            ${getDistanceForPlace(place) != null ? `<p><strong>Distance:</strong> ${formatDistance(getDistanceForPlace(place))}</p>` : ''}
+                        </div>
+                    `);
+                microwaveMarkers.push(microwaveMarker);
+            }
+
+            if (!isRestaurant(place) && place.sections) {
+                place.sections.forEach((section, index) => {
+                    const latOffset = 0.00008 + (index * 0.00003);
+                    const lngOffset = -0.00008 + (index * 0.00003);
+                    const sectionMarker = L.marker(
+                        [section.lat || place.lat + latOffset, section.lng || place.lng + lngOffset],
+                        { icon: getSectionIcon(section) }
+                    )
+                        .addTo(map)
+                        .bindPopup(`
+                            <div class="map-popup">
+                                <h3>${escapeHtml(section.name)}</h3>
+                                <p>${escapeHtml(section.buildingName || place.name)}</p>
+                                ${section.description ? `<p>${escapeHtml(section.description)}</p>` : ''}
+                                ${section.mapsUrl ? `<a href="${escapeHtml(section.mapsUrl)}" target="_blank" rel="noreferrer">Open in Maps</a>` : ''}
+                            </div>
+                        `);
+                    sectionMarker.on('click', () => selectPlace(place));
+                    sectionMarkers.push(sectionMarker);
+                });
+            }
+        });
+    }
+
+    async function loadPlaces() {
+        try {
+            const response = await fetch(API_URL);
+            if (!response.ok) throw new Error('The API did not respond correctly.');
+            places = await response.json();
+            addPlacesToMap();
+            updateHighlightsPanel();
+            statusMessage.textContent = `${places.length} places loaded`;
+        } catch (error) {
+            statusMessage.textContent = 'Could not load data. Start the backend with: python backend/api.py';
+            console.error(error);
+        }
+    }
+
+    function selectPlace(place) {
+        map.flyTo([place.lat, place.lng], 17, { duration: 0.8 });
+        const marker = buildingMarkers.find(item => {
+            const pos = item.getLatLng();
+            return pos.lat === place.lat && pos.lng === place.lng;
+        });
+        if (marker) marker.openPopup();
+        drawWalkingRoute(place);
+    }
+
+    function openPlaceFromParams() {
+        const placeId = pageParams.get('place');
+        if (!placeId) return;
+        const place = places.find(item => item.id === placeId);
+        if (place) selectPlace(place);
+    }
+
+    function search() {
+        const q = normalizeSearchText(input.value.trim());
+        if (!q) { dropdown.classList.remove('show'); return; }
+        box.classList.add('active');
+        const filtered = places
+            .filter(place => getPlaceSearchText(place).includes(q))
+            .sort((a, b) => {
+                const aD = getDistanceForPlace(a), bD = getDistanceForPlace(b);
+                if (aD == null && bD == null) return 0;
+                if (aD == null) return 1;
+                if (bD == null) return -1;
+                return aD - bD;
+            })
+            .slice(0, 12);
+        showResults(filtered);
+    }
+
+    function getMatchingRooms(place) {
+        const q = normalizeSearchText(input.value.trim());
+        if (!q) return [];
+        return (place.rooms || [])
+            .filter(room => normalizeSearchText([room.name, room.address, room.buildingName].join(' ')).includes(q))
+            .slice(0, 5);
+    }
+
+    function showResults(items) {
+        if (!items.length) {
+            dropdown.innerHTML = '<div class="result muted">No results found</div>';
+            dropdown.classList.add('show');
+            return;
+        }
+        dropdown.innerHTML = items.map(place => {
+            const matchingRooms = getMatchingRooms(place);
+            const roomNames = matchingRooms.map(room => escapeHtml(room.name)).join(', ');
+            const distanceInMeters = getDistanceForPlace(place);
+            const metaText = roomNames || `${place.roomCount || (place.rooms || []).length} rooms`;
+            return `
+                <div class="result" data-place-id="${escapeHtml(place.id)}">
+                    <strong>${escapeHtml(place.name)}</strong>
+                    <span>${metaText}${distanceInMeters != null ? ` | ${formatDistance(distanceInMeters)}` : ''}</span>
+                </div>
+            `;
+        }).join('');
+        dropdown.classList.add('show');
+        dropdown.querySelectorAll('.result[data-place-id]').forEach(result => {
+            result.addEventListener('click', () => {
+                const place = places.find(item => item.id === result.dataset.placeId);
+                if (place) { selectPlace(place); dropdown.classList.remove('show'); }
+            });
+        });
+    }
+
+    function clearSearch() {
+        input.value = '';
+        box.classList.remove('active');
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        input.focus();
+    }
+
+    async function showUserLocation() {
+        locateButton.disabled = true;
+        locateButton.textContent = 'Locating...';
+        statusMessage.textContent = 'Fetching your location...';
+        try {
+            userLocation = await requestUserLocation();
+            if (userMarker) userMarker.remove();
+            if (userAccuracyCircle) userAccuracyCircle.remove();
+            userMarker = L.marker([userLocation.latitude, userLocation.longitude], {
+                icon: L.divIcon({
+                    className: '',
+                    html: '<div class="user-location-marker"></div>',
+                    iconSize: [20, 20],
+                    iconAnchor: [10, 10]
+                })
+            }).addTo(map).bindPopup('You are here');
+            userAccuracyCircle = L.circle([userLocation.latitude, userLocation.longitude], {
+                radius: userLocation.accuracy || 25,
+                color: '#2f80ed', weight: 1,
+                fillColor: '#2f80ed', fillOpacity: 0.12
+            }).addTo(map);
+            map.flyTo([userLocation.latitude, userLocation.longitude], 17, { duration: 0.8 });
+            addPlacesToMap();
+            updateHighlightsPanel();
+            clearRoute();
+            routeMessage.textContent = 'Select a building to see a walking trail.';
+            statusMessage.textContent = `Showing distances from your location. Accuracy ${Math.round(userLocation.accuracy || 0)} m.`;
+        } catch (error) {
+            statusMessage.textContent = error.message;
+        } finally {
+            locateButton.disabled = false;
+            locateButton.textContent = 'My location';
+        }
+    }
+
+    searchButton.addEventListener('click', search);
+    clearSearchButton.addEventListener('click', clearSearch);
+    locateButton.addEventListener('click', showUserLocation);
+    input.addEventListener('keydown', event => { if (event.key === 'Enter') search(); });
+    input.addEventListener('input', () => {
+        if (input.value.trim()) { box.classList.add('active'); search(); }
+        else { box.classList.remove('active'); dropdown.classList.remove('show'); }
+    });
+
+    loadPlaces().then(() => {
+        if (pageParams.get('q')) { input.value = pageParams.get('q'); search(); }
+        openPlaceFromParams();
+    });
+</script>
+</body>
+</html>

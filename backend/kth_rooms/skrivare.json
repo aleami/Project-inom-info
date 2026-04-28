@@ -1,0 +1,194 @@
+[
+  {
+    "id": "1",
+    "name": "M102, B-huset",
+    "lat": 59.35165689599213,
+    "lng": 18.068601915344637,
+    "mapsUrl": "http://www.google.com/maps/place/59.35165689599213,18.068601915344637/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "2",
+    "name": "M122, B-huset",
+    "lat": 59.351744403265606,
+    "lng": 18.068591186508478,
+    "mapsUrl": "http://www.google.com/maps/place/59.351744403265606,18.068591186508478/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "3",
+    "name": "Toker, M-huset",
+    "lat": 59.353772049818105,
+    "lng": 18.06540464418079,
+    "mapsUrl": "http://www.google.com/maps/place/59.353772049818105,18.06540464418079/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "4",
+    "name": "Trötter, M-huset",
+    "lat": 59.35380486302761,
+    "lng": 18.065308084655367,
+    "mapsUrl": "http://www.google.com/maps/place/59.35380486302761,18.065308084655367/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "5",
+    "name": "Plan1, M-huset",
+    "lat": 59.35359704549844,
+    "lng": 18.06542610185311,
+    "mapsUrl": "http://www.google.com/maps/place/59.35359704549844,18.06542610185311/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "6",
+    "name": "XQ23, Q-huset",
+    "lat": 59.35022777645475,
+    "lng": 18.067064457672313,
+    "mapsUrl": "http://www.google.com/maps/place/59.35022777645475,18.067064457672313/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "7",
+    "name": "XQ25, Q-huset",
+    "lat": 59.350190959793835,
+    "lng": 18.06700681349152,
+    "mapsUrl": "http://www.google.com/maps/place/59.350190959793835,18.06700681349152/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "8",
+    "name": "XQ32, Q-huset",
+    "lat": 59.350285959648446,
+    "lng": 18.067133999999996,
+    "mapsUrl": "http://www.google.com/maps/place/59.350285959648446,18.067133999999996/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "9",
+    "name": "XW344, W-huset",
+    "lat": 59.35079371377209,
+    "lng": 18.070489728836154,
+    "mapsUrl": "http://www.google.com/maps/place/59.35079371377209,18.070489728836154/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "10",
+    "name": "XW41, W-huset",
+    "lat": 59.35074448958015,
+    "lng": 18.07046827116384,
+    "mapsUrl": "http://www.google.com/maps/place/59.35074448958015,18.07046827116384/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "11",
+    "name": "XW50, W-huset",
+    "lat": 59.350837468549464,
+    "lng": 18.07044681349152,
+    "mapsUrl": "http://www.google.com/maps/place/59.350837468549464,18.07044681349152/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "12",
+    "name": "Bilbo, Teknikringen 14",
+    "lat": 59.34848212950822,
+    "lng": 18.07291416931073,
+    "mapsUrl": "http://www.google.com/maps/place/59.34848212950822,18.07291416931073/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "13",
+    "name": "Frodo, Teknikringen 14",
+    "lat": 59.34854229640875,
+    "lng": 18.072957084655368,
+    "mapsUrl": "http://www.google.com/maps/place/59.34854229640875,18.072957084655368/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "14",
+    "name": "Nils, V-huset",
+    "lat": 59.35126058962656,
+    "lng": 18.07142737301695,
+    "mapsUrl": "http://www.google.com/maps/place/59.35126058962656,18.07142737301695/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "15",
+    "name": "Baltzar, V-huset",
+    "lat": 59.35123324323812,
+    "lng": 18.07142737301695,
+    "mapsUrl": "http://www.google.com/maps/place/59.35123324323812,18.07142737301695/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "16",
+    "name": "Christopher, V-huset",
+    "lat": 59.35127152817577,
+    "lng": 18.071341542327687,
+    "mapsUrl": "http://www.google.com/maps/place/59.35127152817577,18.071341542327687/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "17",
+    "name": "Sporthallen, D-huset",
+    "lat": 59.346935544590366,
+    "lng": 18.073936373016945,
+    "mapsUrl": "http://www.google.com/maps/place/59.346935544590366,18.073936373016945/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "18",
+    "name": "Spelhallen, D-huset",
+    "lat": 59.34685896489298,
+    "lng": 18.073893457672312,
+    "mapsUrl": "http://www.google.com/maps/place/59.34685896489298,18.073893457672312/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "19",
+    "name": "Green, E-huset",
+    "lat": 59.34707131437264,
+    "lng": 18.073017644180787,
+    "mapsUrl": "http://www.google.com/maps/place/59.34707131437264,18.073017644180787/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "20",
+    "name": "KTH-Bibliotek, KTH-Bibliotek",
+    "lat": 59.34799411551139,
+    "lng": 18.072790953695698,
+    "mapsUrl": "http://www.google.com/maps/place/59.34799411551139,18.072790953695698/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "21",
+    "name": "Maxwell, KTH-Bibliotek",
+    "lat": 59.347946372686096,
+    "lng": 18.073110457672314,
+    "mapsUrl": "http://www.google.com/maps/place/59.347946372686096,18.073110457672314/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "22",
+    "name": "ARCH plan 5, A-Huset",
+    "lat": 59.34737665537256,
+    "lng": 18.07245408797639,
+    "mapsUrl": "http://www.google.com/maps/place/59.34737665537256,18.07245408797639/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "23",
+    "name": "RB33, Roslagstullsbacken 33",
+    "lat": 59.352509930776165,
+    "lng": 18.05845427116384,
+    "mapsUrl": "http://www.google.com/maps/place/59.352509930776165,18.05845427116384/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": "24",
+    "name": "THS, Nymble",
+    "lat": 59.34728092298196,
+    "lng": 18.071147192003597,
+    "mapsUrl": "http://www.google.com/maps/place/59.34728092298196,18.071147192003597/&zoom=17",
+    "source": "manual"
+  }
+]

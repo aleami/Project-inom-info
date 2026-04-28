@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restauranger – CampusFinder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap">
+    <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/restaurang.css">
+</head>
+
+<body>
+
+<header>
+    <a href="home.html" class="logo">
+        <div class="logo-icon"><img src="../images/logo.png" alt="logo"></div>
+        <span>CampusFinder</span>
+    </a>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="karta.html">Map</a>
+        <a href="restaurang.html" class="active">Restaurants</a>
+        <a href="about.html">About</a>
+        <a href="grupprum.html" class="cta">Book a Study Room</a>
+    </nav>
+</header>
+
+<!-- ── Hero ──────────────────────────────────────────── -->
+<section class="restaurants-hero">
+    <div class="hero-label">Food & Drinks on Campus</div>
+    <h1>Where to eat on<br><em>KTH Campus</em></h1>
+    <p>All 6 campus dining spots in one place — with opening hours and direct links to today's lunch menus.</p>
+</section>
+
+<!-- ── Cards ─────────────────────────────────────────── -->
+<div class="restaurants-body">
+    <p class="section-label">Dining Options</p>
+    <h2 class="section-heading">Restaurants & Cafés</h2>
+
+    <div class="grid">
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">
+                    <img src="../images/seven-eleven-logo.png" alt=""
+                         onerror="this.parentElement.textContent='🏪'">
+                </div>
+                <div class="card-meta">
+                    <div class="card-name">7-Eleven</div>
+                    <div class="card-hours">Mon–Fri 07:00–23:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=7eleven">View on Map →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">
+                    <img src="../images/la-campus-logo.png" alt=""
+                         onerror="this.parentElement.textContent='☕'">
+                </div>
+                <div class="card-meta">
+                    <div class="card-name">La Campus</div>
+                    <div class="card-hours">Mon–Fri 08:00–17:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=la-campus">View on Map →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">
+                    <img src="../images/syster-o-bror-logo.png" alt=""
+                         onerror="this.parentElement.textContent='🥗'">
+                </div>
+                <div class="card-meta">
+                    <div class="card-name">Syster O Bror</div>
+                    <div class="card-hours">Mon–Fri 10:00–15:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled"
+                   href="https://systerobror.se/restaurang/dagens-lunch/"
+                   target="_blank" rel="noreferrer">Lunch Menu</a>
+            </div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=syster-o-bror">View on Map →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">
+                    <img src="../images/logo_brazilia.png" alt="Brazilia"
+                         onerror="this.parentElement.textContent='🍽️'">
+                </div>
+                <div class="card-meta">
+                    <div class="card-name">Brazilia</div>
+                    <div class="card-hours">Mon–Fri 10:30–14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled"
+                   href="https://www.restaurangbrazilia.se/meny/lunch/"
+                   target="_blank" rel="noreferrer">Lunch Menu</a>
+            </div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=brazilia">View on Map →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">
+                    <img src="../images/nymble.jpg" alt="Nymble"
+                         onerror="this.parentElement.textContent='🍽️'">
+                </div>
+                <div class="card-meta">
+                    <div class="card-name">Nymble</div>
+                    <div class="card-hours">Mon–Fri 11:30–14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled"
+                   href="https://nymble.gastrogate.com/lunch/"
+                   target="_blank" rel="noreferrer">Lunch Menu</a>
+                <a class="menu-btn"
+                   href="https://pdf.gastrogate.com/pdf-lunch/nymble"
+                   target="_blank" rel="noreferrer">Menu PDF</a>
+            </div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=nymble">View on Map →</a>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="card-top">
+                <div class="card-avatar">🏬</div>
+                <div class="card-meta">
+                    <div class="card-name">Murad Kiosken</div>
+                    <div class="card-hours">Mon–Fri 07:00–18:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=murad-kiosken">View on Map →</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<footer>
+    <p>© 2026 KTH CampusFinder</p>
+</footer>
+
+</body>
+</html>

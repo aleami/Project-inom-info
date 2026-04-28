@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFinder — KTH</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap">
+
+    <link rel="stylesheet" href="../css/home.css">
+</head>
+
+<body>
+
+<header>
+    <a href="home.html" class="logo">
+        <div class="logo-icon">
+            <img src="../images/logo.png" alt="CampusFinder">
+        </div>
+        <span>CampusFinder</span>
+    </a>
+
+    <nav>
+        <a href="home.html" class="active">Home</a>
+        <a href="karta.html">Map</a>
+        <a href="restaurang.html">Restaurants</a>
+        <a href="about.html">About</a>
+        <a href="grupprum.html" class="cta">Book a Study Room</a>
+    </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+
+    <!-- MAP -->
+    <div class="map-container">
+        <iframe src="karta.html?preview=1" title="Campus map preview"></iframe>
+    </div>
+
+    <!-- overlay click -->
+    <a href="karta.html" id="heroMapLink" class="hero-map-link"></a>
+
+    <!-- left content -->
+    <div class="hero-left">
+
+        <div class="hero-eyebrow">CampusFinder</div>
+
+        <h1>Find everything<br>on <em>KTH Campus</em></h1>
+
+        <p class="hero-sub">
+            Buildings, study rooms, restaurants — all in one place. No login needed.
+        </p>
+
+        <div class="search-wrap">
+            <div class="search-box">
+                <input id="homeSearch" type="text" placeholder="Search buildings, rooms, facilities…">
+                <span class="close-icon" onclick="clearSearch()">✕</span>
+                <button onclick="goToMap()">Search →</button>
+            </div>
+        </div>
+
+        <div class="quick-links">
+            <a href="karta.html" class="quick-link primary">Open Map →</a>
+            <a href="restaurang.html" class="quick-link">Restaurants</a>
+            <a href="about.html" class="quick-link">About</a>
+            <a href="about.html#team" class="quick-link">Project Members</a>
+        </div>
+
+    </div>
+
+    <div class="map-hint">Click to explore the full map</div>
+
+</section>
+
+<!-- CARDS -->
+<section class="features">
+    <div class="features-inner">
+
+        <p class="section-eyebrow">What you can do</p>
+
+        <h2 class="section-title">
+            Everything you need,<br>nothing you don't
+        </h2>
+
+        <p class="section-sub">
+            Three tools built around how students actually move through campus every day.
+        </p>
+
+        <div class="cards">
+
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/map.png">
+                </div>
+                <h3>Explore the map</h3>
+                <p>Interactive campus map with buildings and facilities.</p>
+                <a href="karta.html" class="card-btn">Open Map →</a>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/book.png">
+                </div>
+                <h3>Find study spaces</h3>
+                <p>Browse available group rooms across campus.</p>
+                <a href="grupprum.html" class="card-btn">View Rooms →</a>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/food.png">
+                </div>
+                <h3>Find restaurants</h3>
+                <p>Discover cafés and dining options on campus.</p>
+                <a href="restaurang.html" class="card-btn">View Restaurants →</a>
+            </div>
+
+        </div>
+
+    </div>
+</section>
+
+<footer>
+    <p>© 2026 KTH CampusFinder</p>
+</footer>
+
+<script>
+function goToMap() {
+    const q = document.getElementById('homeSearch').value;
+    window.location.href = q.trim()
+        ? 'karta.html?q=' + encodeURIComponent(q)
+        : 'karta.html';
+}
+
+function clearSearch() {
+    const el = document.getElementById('homeSearch');
+    el.value = '';
+    el.closest('.search-box').classList.remove('active');
+}
+
+document.getElementById('heroMapLink').addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    document.body.classList.add('page-transitioning');
+    setTimeout(() => {
+        window.location.href = 'karta.html';
+    }, 420);
+});
+</script>
+
+</body>
+</html>
