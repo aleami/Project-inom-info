@@ -1,0 +1,24 @@
+[
+  {
+    "id": "ths",
+    "name": "THS",
+    "shortName": "THS",
+    "buildingName": "Nymble",
+    "lat": 59.34728092298196,
+    "lng": 18.071147192003597,
+    "mapsUrl": "http://www.google.com/maps/place/59.34728092298196,18.071147192003597/&zoom=17",
+    "logoText": "THS",
+    "description": "Student union building at Nymble."
+  },
+  {
+    "id": "teknologrummet",
+    "name": "Teknologrummet",
+    "shortName": "TR",
+    "buildingName": "Teknikringen 8",
+    "lat": 59.348785,
+    "lng": 18.071894,
+    "mapsUrl": "http://www.google.com/maps/place/59.348785,18.071894/&zoom=17",
+    "logoText": "TR",
+    "description": "Student space connected to Teknikringen 8."
+  }
+]

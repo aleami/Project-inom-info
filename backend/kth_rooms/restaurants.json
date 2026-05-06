@@ -1,0 +1,473 @@
+[
+  {
+    "id": "7eleven",
+    "name": "7 Eleven",
+    "type": "restaurant",
+    "lat": 59.3465424,
+    "lng": 18.0717982,
+    "openingHours": "Öppet idag",
+    "address": "Drottning Kristinas väg 9"
+  },
+  {
+    "id": "brazilia",
+    "name": "Brazilia",
+    "type": "restaurant",
+    "lat": 59.353401,
+    "lng": 18.0655062,
+    "openingHours": "Mån–Fre 10:30–14:00",
+    "address": "Brinellvägen 64A"
+  },
+  {
+    "id": "bullens-bar",
+    "name": "Bullens Bar & Restaurang",
+    "type": "restaurant",
+    "lat": 59.3462909,
+    "lng": 18.0699088,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 71"
+  },
+  {
+    "id": "corella-bar-pizzeria",
+    "name": "CORELLA BAR PIZZERIA",
+    "type": "restaurant",
+    "lat": 59.3462909,
+    "lng": 18.0699088,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 71"
+  },
+  {
+    "id": "espresso-house",
+    "name": "Espresso House",
+    "type": "restaurant",
+    "lat": 59.3459353,
+    "lng": 18.0712501,
+    "openingHours": "Mon-Fri 06:15-18:00",
+    "address": "Valhallavägen 77T"
+  },
+  {
+    "id": "fika-cafe",
+    "name": "Fika Cafe",
+    "type": "restaurant",
+    "lat": 59.3506769,
+    "lng": 18.0725362,
+    "openingHours": "Öppet idag",
+    "address": "Teknikringen 68A"
+  },
+  {
+    "id": "jarnvagsrestaurangen-ostra-station",
+    "name": "Järnvägsrestaurangen Östra Station",
+    "type": "restaurant",
+    "lat": 59.3459353,
+    "lng": 18.0712501,
+    "openingHours": "Öppet idag",
+    "address": "Valhallavägen 77"
+  },
+  {
+    "id": "kiosk",
+    "name": "Kiosk",
+    "type": "restaurant",
+    "lat": 59.3461639,
+    "lng": 18.0716097,
+    "openingHours": "Öppet idag",
+    "address": "Östra station"
+  },
+  {
+    "id": "la-campus",
+    "name": "La Campus",
+    "type": "restaurant",
+    "lat": 59.3469353,
+    "lng": 18.071437,
+    "openingHours": "Öppet idag",
+    "address": "Drottning Kristinas väg 13"
+  },
+  {
+    "id": "matcha-ya",
+    "name": "Matcha Ya",
+    "type": "restaurant",
+    "lat": 59.3476434,
+    "lng": 18.0662644,
+    "openingHours": "Mon-Fri 10:00-19:30",
+    "address": "Valhallavägen 49"
+  },
+  {
+    "id": "murad-kiosken",
+    "name": "Murad Kiosken",
+    "type": "restaurant",
+    "lat": 59.34611629720569,
+    "lng": 18.07155698772373,
+    "openingHours": "Öppet idag"
+  },
+  {
+    "id": "nymble",
+    "name": "Nymble",
+    "type": "restaurant",
+    "lat": 59.3475573,
+    "lng": 18.0706041,
+    "openingHours": "Mån–Fre 11:30–14:00",
+    "address": "Drottning Kristinas väg 19"
+  },
+  {
+    "id": "oasen-bar",
+    "name": "oaSen",
+    "type": "restaurant",
+    "lat": 59.3500746,
+    "lng": 18.0691816,
+    "openingHours": "Öppet idag",
+    "address": "Brinellvägen 1"
+  },
+  {
+    "id": "one-more-vietnamese",
+    "name": "One More Vietnamese Taste",
+    "type": "restaurant",
+    "lat": 59.3465255,
+    "lng": 18.0692503,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 67"
+  },
+  {
+    "id": "panini-internazionale",
+    "name": "Panini Internazionale",
+    "type": "restaurant",
+    "lat": 59.3459353,
+    "lng": 18.0712501,
+    "openingHours": "Mon-Fri 07:00-17:00",
+    "address": "Tekniska högskolan tunnelbana"
+  },
+  {
+    "id": "syster-o-bror",
+    "name": "Syster O Bror",
+    "type": "restaurant",
+    "lat": 59.3485498,
+    "lng": 18.0709446,
+    "openingHours": "Öppet idag",
+    "address": "Drottning Kristinas väg 24"
+  },
+  {
+    "id": "taste-by-nordrest-kth",
+    "name": "Taste By Nordrest KTH",
+    "type": "restaurant",
+    "lat": 59.3501825,
+    "lng": 18.0671703,
+    "openingHours": "Öppet idag",
+    "address": "Malvinas väg 4"
+  },
+  {
+    "id": "tekniska-tunnelbana",
+    "name": "Tekniska högskolan tunnelbana",
+    "type": "restaurant",
+    "lat": 59.3456195,
+    "lng": 18.0714724,
+    "openingHours": "Öppet idag",
+    "address": "Tekniska högskolan"
+  },
+  {
+    "id": "the-coffice",
+    "name": "The Coffice",
+    "type": "restaurant",
+    "lat": 59.3506501,
+    "lng": 18.0682438,
+    "openingHours": "Öppet idag",
+    "address": "Drottning Kristinas väg 36A"
+  },
+  {
+    "id": "ths-cafe",
+    "name": "THS Café",
+    "type": "restaurant",
+    "lat": 59.3475573,
+    "lng": 18.0706041,
+    "openingHours": "Öppet idag",
+    "address": "Drottning Kristinas väg 19"
+  },
+  {
+    "id": "ostra-bageriet",
+    "name": "Östra Bageriet",
+    "type": "restaurant",
+    "lat": 59.3459727,
+    "lng": 18.0714639,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 77"
+  },
+  {
+    "id": "cypern",
+    "name": "Restaurang Cypern",
+    "type": "restaurant",
+    "lat": 59.347282,
+    "lng": 18.0652157,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 50"
+  },
+  {
+    "id": "kebab-kitchen",
+    "name": "Kebab Kitchen",
+    "type": "restaurant",
+    "lat": 59.346387,
+    "lng": 18.069639,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 69"
+  },
+  {
+    "id": "mutto-sushi",
+    "name": "MUTTO Sushi",
+    "type": "restaurant",
+    "lat": 59.3464847,
+    "lng": 18.0693649,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 67"
+  },
+  {
+    "id": "asian-wokhouse",
+    "name": "Asian Wokhouse",
+    "type": "restaurant",
+    "lat": 59.3465537,
+    "lng": 18.0691712,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 65"
+  },
+  {
+    "id": "krumel-cookies",
+    "name": "Krümel Cookies & Crumbs",
+    "type": "restaurant",
+    "lat": 59.347335,
+    "lng": 18.0669831,
+    "openingHours": "Tue-Fri 11:00-18:00",
+    "address": "Valhallavägen 53",
+    "rooms": []
+  },
+  {
+    "id": "dino-pizzeria",
+    "name": "Dino Pizzeria",
+    "type": "restaurant",
+    "lat": 59.347335,
+    "lng": 18.0669831,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 53"
+  },
+  {
+    "id": "tekniska-kiosken",
+    "name": "Tekniska Kiosken",
+    "type": "restaurant",
+    "lat": 59.3475175,
+    "lng": 18.0665578,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 51"
+  },
+  {
+    "id": "parla-sushi",
+    "name": "Pärla Sushi",
+    "type": "restaurant",
+    "lat": 59.3475701,
+    "lng": 18.0664352,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 49"
+  },
+  {
+    "id": "two-fat-ladies",
+    "name": "Two Fat Ladies",
+    "type": "restaurant",
+    "lat": 59.3472011,
+    "lng": 18.06736,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 55"
+  },
+  {
+    "id": "cyba-thai-food",
+    "name": "Cyba Thai Food",
+    "type": "restaurant",
+    "lat": 59.3471342,
+    "lng": 18.0669329,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 53"
+  },
+  {
+    "id": "handlarn-tekniska",
+    "name": "Handlar'n Tekniska",
+    "type": "restaurant",
+    "lat": 59.3470381,
+    "lng": 18.0665986,
+    "openingHours": "Open today",
+    "address": "Tekniska högskolan"
+  },
+  {
+    "id": "tekniska-tobak",
+    "name": "Tekniska Tobak",
+    "type": "restaurant",
+    "lat": 59.3471897,
+    "lng": 18.0668485,
+    "openingHours": "Open today",
+    "address": "Tekniska högskolan"
+  },
+  {
+    "id": "cafe-doppio",
+    "name": "Café Doppio",
+    "type": "restaurant",
+    "lat": 59.347126,
+    "lng": 18.066752,
+    "openingHours": "Open today",
+    "address": "Odengatan 4"
+  },
+  {
+    "id": "pressbyran-tekniska-hogskolan",
+    "name": "Pressbyrån Tekniska högskolan",
+    "type": "restaurant",
+    "lat": 59.34576,
+    "lng": 18.07176,
+    "openingHours": "Open today",
+    "address": "Tekniska högskolan / Östra station"
+  },
+  {
+    "id": "hao-kok",
+    "name": "Hao Kök",
+    "type": "restaurant",
+    "lat": 59.3472275,
+    "lng": 18.0669227,
+    "openingHours": "Open today",
+    "address": "Tekniska högskolan / Odengatan"
+  },
+  {
+    "id": "bullar-brod",
+    "name": "Bullar & Bröd",
+    "type": "restaurant",
+    "lat": 59.3466497,
+    "lng": 18.0688879,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 65"
+  },
+  {
+    "id": "ostra-stations-godis-tobak",
+    "name": "Östra Stations Godis & Tobak",
+    "type": "restaurant",
+    "lat": 59.3460386,
+    "lng": 18.0715216,
+    "openingHours": "Open today",
+    "address": "Östra station"
+  },
+  {
+    "id": "himalaya-livsmedelsbutik",
+    "name": "Himalaya Livsmedelsbutik",
+    "type": "restaurant",
+    "lat": 59.3464577,
+    "lng": 18.069436,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 67"
+  },
+  {
+    "id": "damascus-deli",
+    "name": "Damascus Deli",
+    "type": "restaurant",
+    "lat": 59.3461305,
+    "lng": 18.0704837,
+    "openingHours": "Open today",
+    "address": "Valhallavägen 71"
+  },
+  {
+    "id": "vallhallagrillen",
+    "name": "Vallhallagrillen",
+    "type": "restaurant",
+    "lat": 59.3450124,
+    "lng": 18.0738701,
+    "openingHours": "Open today",
+    "address": "Valhallavägen"
+  },
+  {
+    "id": "stories-kth",
+    "name": "Stories KTH",
+    "type": "restaurant",
+    "lat": 59.3478198,
+    "lng": 18.0728004,
+    "openingHours": "Open today",
+    "address": "Osquars backe 31"
+  },
+  {
+    "id": "proviant-albano",
+    "name": "Proviant Albano",
+    "type": "restaurant",
+    "lat": 59.3551461,
+    "lng": 18.0560069,
+    "openingHours": "Lunch 11:00-14:00",
+    "address": "Albanovägen 24"
+  },
+  {
+    "id": "proviant-cafe-albano",
+    "name": "Proviant Café Albano",
+    "type": "restaurant",
+    "lat": 59.35497,
+    "lng": 18.05617,
+    "openingHours": "Open today",
+    "address": "Hus 2, Albanovägen 24"
+  },
+  {
+    "id": "the-coffice-albano",
+    "name": "The Coffice Albano",
+    "type": "restaurant",
+    "lat": 59.3542494,
+    "lng": 18.0572915,
+    "openingHours": "Mon-Thu 07:30-17:00",
+    "address": "Hannes Alfvéns väg 10"
+  },
+  {
+    "id": "pressbyran-albano",
+    "name": "Pressbyrån Albano",
+    "type": "restaurant",
+    "lat": 59.3549918,
+    "lng": 18.0577093,
+    "openingHours": "Mon-Fri 08:00-19:00",
+    "address": "Albanovägen 12"
+  },
+  {
+    "id": "restaurang-entre-albanova",
+    "name": "Restaurang Entré AlbaNova",
+    "type": "restaurant",
+    "lat": 59.3538664,
+    "lng": 18.0577259,
+    "openingHours": "Lunch 10:30-14:00",
+    "address": "Roslagstullsbacken 21"
+  },
+  {
+    "id": "vardshuset-kraftan",
+    "name": "Värdshuset Kräftan",
+    "type": "restaurant",
+    "lat": 59.3587309,
+    "lng": 18.0556253,
+    "openingHours": "Lunch Mon-Fri 10:30-13:30",
+    "address": "Kräftriket 9C"
+  },
+  {
+    "id": "cafe-bellevue",
+    "name": "Café Bellevue",
+    "type": "restaurant",
+    "lat": 59.3520964,
+    "lng": 18.05285,
+    "openingHours": "Open today",
+    "address": "Bellevuevägen 10"
+  },
+  {
+    "id": "t-snabben",
+    "name": "T-Snabben",
+    "type": "restaurant",
+    "lat": 59.3455,
+    "lng": 18.07118,
+    "openingHours": "Mon-Fri 06:30-19:00",
+    "address": "Valhallavägen 77",
+    "rooms": []
+  },
+  {
+    "id": "subway-danderydsgatan",
+    "name": "Subway Danderydsgatan",
+    "type": "restaurant",
+    "lat": 59.3446091,
+    "lng": 18.0708181,
+    "openingHours": "Mon-Sun 11:00-19:00",
+    "address": "Danderydsgatan 27",
+    "rooms": []
+  },
+  {
+    "id": "stockholms-ostra-roslagsbanan",
+    "name": "Stockholms östra Roslagsbanan",
+    "type": "restaurant",
+    "lat": 59.3465554,
+    "lng": 18.0706402,
+    "openingHours": "Öppet idag",
+    "address": "Stockholms östra / Valhallavägen",
+    "rooms": []
+  }
+]

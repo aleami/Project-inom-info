@@ -1,0 +1,66 @@
+[
+  {
+    "id": 39,
+    "name": "E-huset",
+    "lat": 59.346999,
+    "lng": 18.072972,
+    "microwave": true,
+    "count": 8
+  },
+  {
+    "id": 100,
+    "name": "KTH Innovation",
+    "lat": 59.34955920649063,
+    "lng": 18.071678399989757,
+    "microwave": true,
+    "count": 5
+  },
+  {
+    "id": 12,
+    "name": "M-huset",
+    "lat": 59.35347326923611,
+    "lng": 18.065258459697176,
+    "microwave": true,
+    "count": 9
+  },
+  {
+    "id": 3,
+    "name": "Q-huset",
+    "lat": 59.35007418321177,
+    "lng": 18.06694262697614,
+    "microwave": true,
+    "count": 7
+  },
+  {
+    "id": 36,
+    "name": "U-huset",
+    "lat": 59.35108449924672,
+    "lng": 18.070020420412632,
+    "microwave": true,
+    "count": 10
+  },
+  {
+    "id": 17,
+    "name": "V-huset",
+    "lat": 59.35114079528462,
+    "lng": 18.071565199962066,
+    "microwave": true,
+    "count": 6
+  },
+  {
+    "id": 200,
+    "name": "W-huset",
+    "lat": 59.35067274925012,
+    "lng": 18.070655892537182,
+    "microwave": true,
+    "count": 8
+  },
+  {
+    "id": 201,
+    "name": "Nymble",
+    "lat": 59.34737750591929,
+    "lng": 18.07068177967235,
+    "microwave": true,
+    "count": 30
+  }
+]

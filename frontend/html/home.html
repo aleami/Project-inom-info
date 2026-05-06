@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CampusFinder - KTH</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap">
+
+    <link rel="stylesheet" href="../css/home.css">
+</head>
+
+<body>
+
+<header>
+    <a href="home.html" class="logo">
+        <div class="logo-icon">
+            <img src="../images/logo.png" alt="CampusFinder">
+        </div>
+        <span>CampusFinder</span>
+    </a>
+
+    <nav>
+        <a href="home.html" class="active">Home</a>
+        <a href="karta.html">Map</a>
+        <a href="restaurang.html">Restaurants</a>
+        <a href="about.html">About</a>
+        <a href="grupprum.html" class="cta">Book a Study Room</a>
+    </nav>
+</header>
+
+<section class="hero">
+    <div class="map-container">
+        <iframe src="karta.html?preview=1&category=buildings" title="Campus map preview"></iframe>
+    </div>
+
+    <a href="karta.html" id="heroMapLink" class="hero-map-link"></a>
+
+    <div class="hero-left">
+        <div class="hero-eyebrow">CampusFinder</div>
+
+        <h1>Find everything<br>on <em>KTH Campus</em></h1>
+
+        <p class="hero-sub">
+            Buildings, study rooms, 50 restaurants and campus essentials in one place. Built to make everyday movement across campus feel simple.
+        </p>
+
+        <div class="search-wrap">
+            <div class="search-box">
+                <input id="homeSearch" type="text" placeholder="Search CampusFinder">
+                <span class="close-icon" onclick="clearSearch()">x</span>
+                <button onclick="goToMap()" aria-label="Search CampusFinder">
+                    <span class="search-button-icon" aria-hidden="true"></span>
+                </button>
+            </div>
+        </div>
+
+        <div class="hero-pills">
+            <div class="hero-pill">Live room availability</div>
+            <div class="hero-pill">Microwaves and printers</div>
+            <div class="hero-pill">50 food spots</div>
+        </div>
+
+        <div class="quick-links">
+            <a href="karta.html" class="quick-link primary">Open Map</a>
+            <a href="restaurang.html" class="quick-link">Restaurants</a>
+            <a href="about.html" class="quick-link">About</a>
+            <a href="about.html#team" class="quick-link">Project Members</a>
+        </div>
+    </div>
+
+    <div class="map-hint">Click to explore the full map</div>
+</section>
+
+<section class="features">
+    <div class="features-inner">
+        <p class="section-eyebrow">What you can do</p>
+
+        <h2 class="section-title">
+            Everything you need,<br>nothing you don't
+        </h2>
+
+        <p class="section-sub">
+            Three focused tools built around how students actually move, meet, eat and study across campus every day.
+        </p>
+
+        <div class="cards">
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/map.png" alt="Map">
+                </div>
+                <h3>Explore the map</h3>
+                <p>Interactive campus map with buildings, sections, microwaves, printers, restaurants and direct navigation.</p>
+                <a href="karta.html" class="card-btn">Open Map</a>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/book.png" alt="Book">
+                </div>
+                <h3>Find study spaces</h3>
+                <p>Browse live availability and jump straight to bookable group rooms without extra steps.</p>
+                <a href="grupprum.html" class="card-btn">View Rooms</a>
+            </div>
+
+            <div class="card">
+                <div class="icon">
+                    <img src="../images/food.png" alt="Food">
+                </div>
+                <h3>Find restaurants</h3>
+                <p>Discover 50 restaurants, cafes, kiosks and student hangouts across KTH, Albano and nearby campus areas in one clear overview.</p>
+                <a href="restaurang.html" class="card-btn">View Restaurants</a>
+            </div>
+        </div>
+    </div>
+</section>
+
+<footer>
+    <p>&copy; 2026 KTH CampusFinder</p>
+</footer>
+
+<script>
+function goToMap() {
+    const q = document.getElementById('homeSearch').value;
+    window.location.href = q.trim()
+        ? 'karta.html?q=' + encodeURIComponent(q)
+        : 'karta.html';
+}
+
+function clearSearch() {
+    const el = document.getElementById('homeSearch');
+    el.value = '';
+    el.closest('.search-box').classList.remove('active');
+}
+
+document.getElementById('homeSearch').addEventListener('keydown', event => {
+    if (event.key === 'Enter') {
+        event.preventDefault();
+        goToMap();
+    }
+});
+
+document.getElementById('heroMapLink').addEventListener('click', e => {
+    if (e.metaKey || e.ctrlKey) return;
+    e.preventDefault();
+    document.body.classList.add('page-transitioning');
+    setTimeout(() => {
+        window.location.href = 'karta.html';
+    }, 420);
+});
+</script>
+
+</body>
+</html>

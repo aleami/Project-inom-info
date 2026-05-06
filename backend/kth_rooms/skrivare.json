@@ -1,0 +1,122 @@
+[
+  {
+    "id": 1,
+    "name": "A-Huset",
+    "lat": 59.34737665537256,
+    "lng": 18.07245408797639,
+    "printer": true,
+    "count": 4,
+    "mapsUrl": "http://www.google.com/maps/place/59.34737665537256,18.07245408797639/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 2,
+    "name": "B-huset",
+    "lat": 59.35165689599213,
+    "lng": 18.068601915344637,
+    "printer": true,
+    "count": 9,
+    "mapsUrl": "http://www.google.com/maps/place/59.35165689599213,18.068601915344637/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 3,
+    "name": "D-huset",
+    "lat": 59.346935544590366,
+    "lng": 18.073936373016945,
+    "printer": true,
+    "count": 7,
+    "mapsUrl": "http://www.google.com/maps/place/59.346935544590366,18.073936373016945/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 4,
+    "name": "E-huset",
+    "lat": 59.34707131437264,
+    "lng": 18.073017644180787,
+    "printer": true,
+    "count": 5,
+    "mapsUrl": "http://www.google.com/maps/place/59.34707131437264,18.073017644180787/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 5,
+    "name": "KTH-Bibliotek",
+    "lat": 59.34799411551139,
+    "lng": 18.072790953695698,
+    "printer": true,
+    "count": 6,
+    "mapsUrl": "http://www.google.com/maps/place/59.34799411551139,18.072790953695698/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 6,
+    "name": "M-huset",
+    "lat": 59.353772049818105,
+    "lng": 18.06540464418079,
+    "printer": true,
+    "count": 11,
+    "mapsUrl": "http://www.google.com/maps/place/59.353772049818105,18.06540464418079/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 7,
+    "name": "Nymble",
+    "lat": 59.34728092298196,
+    "lng": 18.071147192003597,
+    "printer": true,
+    "count": 8,
+    "mapsUrl": "http://www.google.com/maps/place/59.34728092298196,18.071147192003597/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 8,
+    "name": "Q-huset",
+    "lat": 59.35022777645475,
+    "lng": 18.067064457672313,
+    "printer": true,
+    "count": 10,
+    "mapsUrl": "http://www.google.com/maps/place/59.35022777645475,18.067064457672313/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 9,
+    "name": "Roslagstullsbacken 33",
+    "lat": 59.352509930776165,
+    "lng": 18.05845427116384,
+    "printer": true,
+    "count": 3,
+    "mapsUrl": "http://www.google.com/maps/place/59.352509930776165,18.05845427116384/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 10,
+    "name": "Teknikringen 14",
+    "lat": 59.34848212950822,
+    "lng": 18.07291416931073,
+    "printer": true,
+    "count": 6,
+    "mapsUrl": "http://www.google.com/maps/place/59.34848212950822,18.07291416931073/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 11,
+    "name": "V-huset",
+    "lat": 59.35126058962656,
+    "lng": 18.07142737301695,
+    "printer": true,
+    "count": 12,
+    "mapsUrl": "http://www.google.com/maps/place/59.35126058962656,18.07142737301695/&zoom=17",
+    "source": "manual"
+  },
+  {
+    "id": 12,
+    "name": "W-huset",
+    "lat": 59.35079371377209,
+    "lng": 18.070489728836154,
+    "printer": true,
+    "count": 9,
+    "mapsUrl": "http://www.google.com/maps/place/59.35079371377209,18.070489728836154/&zoom=17",
+    "source": "manual"
+  }
+]

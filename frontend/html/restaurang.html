@@ -1,0 +1,1147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurants - CampusFinder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap">
+    <link rel="stylesheet" href="../css/home.css">
+    <link rel="stylesheet" href="../css/restaurang.css">
+</head>
+<body>
+
+<header>
+    <a href="home.html" class="logo">
+        <div class="logo-icon"><img src="../images/logo.png" alt="logo"></div>
+        <span>CampusFinder</span>
+    </a>
+    <nav>
+        <a href="home.html">Home</a>
+        <a href="karta.html">Map</a>
+        <a href="restaurang.html" class="active">Restaurants</a>
+        <a href="about.html">About</a>
+        <a href="grupprum.html" class="cta">Book a Study Room</a>
+    </nav>
+</header>
+
+<section class="restaurants-hero">
+    <div class="hero-label">Food &amp; Drinks on Campus</div>
+    <h1>Where to eat on<br><em>KTH Campus</em></h1>
+    <p>All 50 restaurant, café and kiosk spots in one place, from cafés and lunch stops to bars and kiosks across KTH, Albano and nearby campus life.</p>
+</section>
+
+<div class="restaurants-body">
+    <p class="section-label">Dining Options</p>
+    <h2 class="section-heading">Restaurants, Cafés &amp; Bars</h2>
+
+    <!-- Filter bar: All | Has Menu | Nearby | A-Z dropdown -->
+    <div class="filter-bar">
+        <button class="filter-btn active" data-filter="all">All</button>
+        <button class="filter-btn" data-filter="menu">Has Menu</button>
+        <button class="filter-btn" id="nearbyBtn">📍 Nearby</button>
+
+        <!-- Letter dropdown -->
+        <div class="letter-filter">
+            <button class="letter-dropdown-trigger" id="letterTrigger">
+                A–Z <em class="chevron">▾</em>
+            </button>
+            <div class="letter-dropdown" id="letterDropdown"></div>
+        </div>
+    </div>
+
+    <div class="restaurant-search" id="restaurantSearchBox">
+        <input id="restaurantSearch" type="text" placeholder="Search restaurants, cafes or bars" autocomplete="off">
+        <button class="restaurant-search-clear" id="restaurantSearchClear" type="button" aria-label="Clear restaurant search" hidden>x</button>
+        <button class="restaurant-search-button" id="restaurantSearchButton" type="button" aria-label="Search restaurants">
+            <span class="restaurant-search-button-icon" aria-hidden="true"></span>
+        </button>
+    </div>
+    <!-- Active letter indicator -->
+    <div id="nearbyInfo" class="nearby-info"></div>
+
+    <div class="grid" id="restaurantGrid">
+
+        <div class="card" data-name="7 Eleven" data-tags="open menu 7-Eleven" data-lat="59.3465424" data-lng="18.0717982">
+            <div class="card-top">
+                <div class="card-avatar"><img src="../images/seven-eleven-logo.png" alt="7-Eleven"></div>
+                <div class="card-meta">
+                    <div class="card-name">7 Eleven</div>
+                    <div class="card-category"><span aria-hidden="true"><img src="../images/seven-eleven-logo.png" alt=""></span>7-Eleven</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.7-eleven.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=7eleven">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Asian Wokhouse" data-tags="open Asiatiskt" data-lat="59.3465537" data-lng="18.0691712">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥢</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Asian Wokhouse</div>
+                    <div class="card-category"><span aria-hidden="true">🥢</span>Asiatiskt</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=asian-wokhouse">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Brazilia" data-tags="open menu Lunchrestaurang" data-lat="59.3534010" data-lng="18.0655062">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Brazilia</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Lunchrestaurang</div>
+                    <div class="card-hours">Mån–Fre 10:30–14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.restaurangbrazilia.se/meny/lunch/" target="_blank" rel="noreferrer">Lunch Menu</a>
+                <a class="card-map-btn" href="karta.html?place=brazilia">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Bullar &amp; Bröd" data-tags="open menu Bageri &amp; café" data-lat="59.3466497" data-lng="18.0688879">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥐</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Bullar &amp; Bröd</div>
+                    <div class="card-category"><span aria-hidden="true">🥐</span>Bageri &amp; café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.bullarochbrod.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=bullar-brod">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Bullens Bar &amp; Restaurang" data-tags="open menu Bar &amp; restaurang" data-lat="59.3462909" data-lng="18.0699088">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍻</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Bullens Bar &amp; Restaurang</div>
+                    <div class="card-category"><span aria-hidden="true">🍻</span>Bar &amp; restaurang</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.bullensbar.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=bullens-bar">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Café Bellevue" data-tags="open menu Café" data-lat="59.3520964" data-lng="18.0528500">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Café Bellevue</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://bellevuekonferens.se/kafe.html" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=cafe-bellevue">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Café Doppio" data-tags="open menu Café" data-lat="59.3471260" data-lng="18.0667520">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Café Doppio</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://cafedoppio.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=cafe-doppio">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="CORELLA BAR PIZZERIA" data-tags="open menu Pizzeria" data-lat="59.3462909" data-lng="18.0699088">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">CORELLA BAR PIZZERIA</div>
+                    <div class="card-category"><span aria-hidden="true">🍕</span>Pizzeria</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.corella.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=corella-bar-pizzeria">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Cyba Thai Food" data-tags="open Thaimat" data-lat="59.3471342" data-lng="18.0669329">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥢</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Cyba Thai Food</div>
+                    <div class="card-category"><span aria-hidden="true">🥢</span>Thaimat</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=cyba-thai-food">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Damascus Deli" data-tags="open Deli" data-lat="59.3461305" data-lng="18.0704837">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥙</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Damascus Deli</div>
+                    <div class="card-category"><span aria-hidden="true">🥙</span>Deli</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=damascus-deli">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Dino Pizzeria" data-tags="open menu Pizzeria" data-lat="59.3473350" data-lng="18.0669831">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Dino Pizzeria</div>
+                    <div class="card-category"><span aria-hidden="true">🍕</span>Pizzeria</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="http://www.dinopizzeria.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=dino-pizzeria">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Espresso House" data-tags="open menu Café" data-lat="59.3459353" data-lng="18.0712501">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Espresso House</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Mon-Fri 06:15-18:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://espressohouse.com/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=espresso-house">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Fika Cafe" data-tags="open Café" data-lat="59.3506769" data-lng="18.0725362">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Fika Cafe</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=fika-cafe">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Handlar&#x27;n Tekniska" data-tags="open Kiosk &amp; livs" data-lat="59.3470381" data-lng="18.0665986">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Handlar&#x27;n Tekniska</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Kiosk &amp; livs</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=handlarn-tekniska">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Hao Kök" data-tags="open menu Asiatiskt" data-lat="59.3472275" data-lng="18.0669227">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥢</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Hao Kök</div>
+                    <div class="card-category"><span aria-hidden="true">🥢</span>Asiatiskt</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.haokokse.com/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=hao-kok">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Himalaya Livsmedelsbutik" data-tags="open Livs &amp; kiosk" data-lat="59.3464577" data-lng="18.0694360">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Himalaya Livsmedelsbutik</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Livs &amp; kiosk</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=himalaya-livsmedelsbutik">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Järnvägsrestaurangen Östra Station" data-tags="open Klassisk restaurang" data-lat="59.3459353" data-lng="18.0712501">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Järnvägsrestaurangen Östra Station</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Klassisk restaurang</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=jarnvagsrestaurangen-ostra-station">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Kebab Kitchen" data-tags="open menu Kebab &amp; grill" data-lat="59.3463870" data-lng="18.0696390">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥙</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Kebab Kitchen</div>
+                    <div class="card-category"><span aria-hidden="true">🥙</span>Kebab &amp; grill</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://kebabkitchen.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=kebab-kitchen">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Kiosk" data-tags="open Kiosk" data-lat="59.3461639" data-lng="18.0716097">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Kiosk</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Kiosk</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=kiosk">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Krümel Cookies &amp; Crumbs" data-tags="open menu Café &amp; cookies" data-lat="59.3473350" data-lng="18.0669831">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍪</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Krümel Cookies &amp; Crumbs</div>
+                    <div class="card-category"><span aria-hidden="true">🍪</span>Café &amp; cookies</div>
+                    <div class="card-hours">Tue-Fri 11:00-18:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://krumelcookies.com/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=krumel-cookies">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="La Campus" data-tags="open menu Lunchrestaurang" data-lat="59.3469353" data-lng="18.0714370">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">La Campus</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Lunchrestaurang</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.lacampus.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=la-campus">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Matcha Ya" data-tags="open menu Japanskt café" data-lat="59.3476434" data-lng="18.0662644">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍵</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Matcha Ya</div>
+                    <div class="card-category"><span aria-hidden="true">🍵</span>Japanskt café</div>
+                    <div class="card-hours">Mon-Fri 10:00-19:30</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.matchaya.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=matcha-ya">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Murad Kiosken" data-tags="open Kiosk" data-lat="59.3461163" data-lng="18.0715570">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Murad Kiosken</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Kiosk</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=murad-kiosken">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="MUTTO Sushi" data-tags="open menu Sushi" data-lat="59.3464847" data-lng="18.0693649">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍣</span></div>
+                <div class="card-meta">
+                    <div class="card-name">MUTTO Sushi</div>
+                    <div class="card-category"><span aria-hidden="true">🍣</span>Sushi</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://muttosushi.com/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=mutto-sushi">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Nymble" data-tags="open menu Studentrestaurang" data-lat="59.3475573" data-lng="18.0706041">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Nymble</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Studentrestaurang</div>
+                    <div class="card-hours">Mån–Fre 11:30–14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://nymble.gastrogate.com/lunch/" target="_blank" rel="noreferrer">Lunch Menu</a>
+                <a class="card-map-btn" href="karta.html?place=nymble">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="oaSen" data-tags="open Bar &amp; studenthäng" data-lat="59.3500746" data-lng="18.0691816">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍻</span></div>
+                <div class="card-meta">
+                    <div class="card-name">oaSen</div>
+                    <div class="card-category"><span aria-hidden="true">🍻</span>Bar &amp; studenthäng</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=oasen-bar">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="One More Vietnamese Taste" data-tags="open menu Asiatiskt" data-lat="59.3465255" data-lng="18.0692503">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥢</span></div>
+                <div class="card-meta">
+                    <div class="card-name">One More Vietnamese Taste</div>
+                    <div class="card-category"><span aria-hidden="true">🥢</span>Asiatiskt</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.onemorerestaurant.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=one-more-vietnamese">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Östra Bageriet" data-tags="open Bageri &amp; café" data-lat="59.3459727" data-lng="18.0714639">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥐</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Östra Bageriet</div>
+                    <div class="card-category"><span aria-hidden="true">🥐</span>Bageri &amp; café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=ostra-bageriet">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Östra Stations Godis &amp; Tobak" data-tags="open Godis &amp; tobak" data-lat="59.3460386" data-lng="18.0715216">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍬</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Östra Stations Godis &amp; Tobak</div>
+                    <div class="card-category"><span aria-hidden="true">🍬</span>Godis &amp; tobak</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=ostra-stations-godis-tobak">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Panini Internazionale" data-tags="open menu Café &amp; mackor" data-lat="59.3459353" data-lng="18.0712501">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥪</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Panini Internazionale</div>
+                    <div class="card-category"><span aria-hidden="true">🥪</span>Café &amp; mackor</div>
+                    <div class="card-hours">Mon-Fri 07:00-17:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://panini.nu/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=panini-internazionale">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Pärla Sushi" data-tags="open menu Sushi" data-lat="59.3475701" data-lng="18.0664352">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍣</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Pärla Sushi</div>
+                    <div class="card-category"><span aria-hidden="true">🍣</span>Sushi</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.parlasushi.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=parla-sushi">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Pressbyrån Albano" data-tags="open menu Pressbyrån" data-lat="59.3549918" data-lng="18.0577093">
+            <div class="card-top">
+                <div class="card-avatar"><img src="../images/pressbyran-logo.png" alt="Pressbyrån"></div>
+                <div class="card-meta">
+                    <div class="card-name">Pressbyrån Albano</div>
+                    <div class="card-category"><span aria-hidden="true"><img src="../images/pressbyran-logo.png" alt=""></span>Pressbyrån</div>
+                    <div class="card-hours">Mon-Fri 08:00-19:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.pressbyran.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=pressbyran-albano">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Pressbyrån Tekniska högskolan" data-tags="open menu Pressbyrån" data-lat="59.3457600" data-lng="18.0717600">
+            <div class="card-top">
+                <div class="card-avatar"><img src="../images/pressbyran-logo.png" alt="Pressbyrån"></div>
+                <div class="card-meta">
+                    <div class="card-name">Pressbyrån Tekniska högskolan</div>
+                    <div class="card-category"><span aria-hidden="true"><img src="../images/pressbyran-logo.png" alt=""></span>Pressbyrån</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.pressbyran.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=pressbyran-tekniska-hogskolan">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Proviant Albano" data-tags="open menu Restaurang, café &amp; pub" data-lat="59.3551461" data-lng="18.0560069">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Proviant Albano</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Restaurang, café &amp; pub</div>
+                    <div class="card-hours">Lunch 11:00-14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://proviantalbano.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=proviant-albano">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Proviant Café Albano" data-tags="open menu Café &amp; bageri" data-lat="59.3549700" data-lng="18.0561700">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥐</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Proviant Café Albano</div>
+                    <div class="card-category"><span aria-hidden="true">🥐</span>Café &amp; bageri</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://proviantalbano.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=proviant-cafe-albano">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Restaurang Cypern" data-tags="open menu Medelhavsmat" data-lat="59.3472820" data-lng="18.0652157">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Restaurang Cypern</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Medelhavsmat</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://restaurangcypern.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=cypern">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Restaurang Entré AlbaNova" data-tags="open menu Lunchrestaurang" data-lat="59.3538664" data-lng="18.0577259">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Restaurang Entré AlbaNova</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Lunchrestaurang</div>
+                    <div class="card-hours">Lunch 10:30-14:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.fagelangenscatering.se/lunch-restaurang-albanova/" target="_blank" rel="noreferrer">Lunch Menu</a>
+                <a class="card-map-btn" href="karta.html?place=restaurang-entre-albanova">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Stories KTH" data-tags="open menu Café" data-lat="59.3478198" data-lng="18.0728004">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Stories KTH</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://storiescafe.se/kth/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=stories-kth">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Subway Danderydsgatan" data-tags="open menu Snabbmat &amp; mackor" data-lat="59.3446091" data-lng="18.0708181">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🥪</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Subway Danderydsgatan</div>
+                    <div class="card-category"><span aria-hidden="true">🥪</span>Snabbmat &amp; mackor</div>
+                    <div class="card-hours">Mon-Sun 11:00-19:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.subway.com/sv-se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=subway-danderydsgatan">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Syster O Bror" data-tags="open menu Restaurang &amp; café" data-lat="59.3485498" data-lng="18.0709446">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Syster O Bror</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Restaurang &amp; café</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://systerobror.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=syster-o-bror">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="T-Snabben" data-tags="open T-Snabben kiosk" data-lat="59.3455000" data-lng="18.0711800">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">T-Snabben</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>T-Snabben kiosk</div>
+                    <div class="card-hours">Mon-Fri 06:30-19:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=t-snabben">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Taste By Nordrest KTH" data-tags="open Lunchrestaurang" data-lat="59.3501825" data-lng="18.0671703">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Taste By Nordrest KTH</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Lunchrestaurang</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=taste-by-nordrest-kth">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Tekniska Kiosken" data-tags="open Kiosk" data-lat="59.3475175" data-lng="18.0665578">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Tekniska Kiosken</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Kiosk</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=tekniska-kiosken">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Tekniska Tobak" data-tags="open Tobak &amp; kiosk" data-lat="59.3471897" data-lng="18.0668485">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🛒</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Tekniska Tobak</div>
+                    <div class="card-category"><span aria-hidden="true">🛒</span>Tobak &amp; kiosk</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=tekniska-tobak">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="The Coffice" data-tags="open Café" data-lat="59.3506501" data-lng="18.0682438">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">The Coffice</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=the-coffice">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="The Coffice Albano" data-tags="open Café &amp; arbetsplats" data-lat="59.3542494" data-lng="18.0572915">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">The Coffice Albano</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café &amp; arbetsplats</div>
+                    <div class="card-hours">Mon-Thu 07:30-17:00</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=the-coffice-albano">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="THS Café" data-tags="open Café" data-lat="59.3475573" data-lng="18.0706041">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">THS Café</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Öppet idag</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=ths-cafe">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Two Fat Ladies" data-tags="open menu Café" data-lat="59.3472011" data-lng="18.0673600">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">☕</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Two Fat Ladies</div>
+                    <div class="card-category"><span aria-hidden="true">☕</span>Café</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://www.twofatladies.se/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=two-fat-ladies">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Vallhallagrillen" data-tags="open Grill" data-lat="59.3450124" data-lng="18.0738701">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🔥</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Vallhallagrillen</div>
+                    <div class="card-category"><span aria-hidden="true">🔥</span>Grill</div>
+                    <div class="card-hours">Open today</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="card-bottom">
+                <a class="card-map-btn" href="karta.html?place=vallhallagrillen">View on Map &rarr;</a>
+            </div>
+        </div>
+
+        <div class="card" data-name="Värdshuset Kräftan" data-tags="open menu Lunch &amp; värdshus" data-lat="59.3587309" data-lng="18.0556253">
+            <div class="card-top">
+                <div class="card-avatar"><span aria-hidden="true">🍽️</span></div>
+                <div class="card-meta">
+                    <div class="card-name">Värdshuset Kräftan</div>
+                    <div class="card-category"><span aria-hidden="true">🍽️</span>Lunch &amp; värdshus</div>
+                    <div class="card-hours">Lunch Mon-Fri 10:30-13:30</div>
+                </div>
+            </div>
+            <div class="card-divider"></div>
+            <div class="menu-links">
+                <a class="menu-btn filled" href="https://kraftan.nu/" target="_blank" rel="noreferrer">Website</a>
+                <a class="card-map-btn" href="karta.html?place=vardshuset-kraftan">View on Map &rarr;</a>
+            </div>
+        </div>
+
+
+    </div>
+</div>
+
+<footer>
+    <p>&copy; 2026 KTH CampusFinder</p>
+</footer>
+
+<script>
+    // ── State ──────────────────────────────────────────────────────
+    const grid         = document.getElementById('restaurantGrid');
+    const nearbyBtn    = document.getElementById('nearbyBtn');
+    const nearbyInfo   = document.getElementById('nearbyInfo');
+    const letterTrigger = document.getElementById('letterTrigger');
+    const letterDropdown = document.getElementById('letterDropdown');
+    const restaurantSearch = document.getElementById('restaurantSearch');
+    const restaurantSearchClear = document.getElementById('restaurantSearchClear');
+    const restaurantSearchButton = document.getElementById('restaurantSearchButton');
+
+    let allCards     = [];
+    let activeFilter = 'all';   // 'all' | 'menu'
+    let activeLetter = null;    // null | normalised letter key
+    let nearbyMode   = false;
+    let activeQuery  = '';
+    let userLat      = null;
+    let userLng      = null;
+
+    // ── Haversine ─────────────────────────────────────────────────
+    function distM(lat1, lng1, lat2, lng2) {
+        const R = 6371000, r = d => d * Math.PI / 180;
+        const a = Math.sin(r(lat2-lat1)/2)**2 +
+                  Math.cos(r(lat1)) * Math.cos(r(lat2)) * Math.sin(r(lng2-lng1)/2)**2;
+        return R * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+    }
+    function fmtDist(m) {
+        return m < 1000 ? `${Math.round(m)} m away` : `${(m/1000).toFixed(1)} km away`;
+    }
+
+    // ── Normalise first letter for grouping ───────────────────────
+    function normalizeQuery(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function getCardSearchText(card) {
+        return normalizeQuery([
+            card.dataset.name,
+            card.dataset.tags,
+            card.textContent
+        ].join(' '));
+    }
+
+    function runRestaurantSearch() {
+        activeQuery = normalizeQuery(restaurantSearch.value);
+        restaurantSearchClear.hidden = !restaurantSearch.value.trim();
+        applyFilters();
+    }
+
+    function normLetter(name) {
+        const ch = name.trim()[0].toUpperCase();
+        // digits → keep as-is; Swedish Å/Ä → A; Ö → O
+        if (/\d/.test(ch)) return ch;
+        return ch.replace(/[ÅÄ]/g, 'A').replace(/Ö/g, 'O');
+    }
+
+    // ── Alpha sort ────────────────────────────────────────────────
+    function sortAlpha(cards) {
+        return [...cards].sort((a, b) =>
+            a.dataset.name.localeCompare(b.dataset.name, 'sv')
+        );
+    }
+
+    // ── Build letter dropdown ─────────────────────────────────────
+    function buildLetterDropdown() {
+        const letters = [...new Set(allCards.map(c => normLetter(c.dataset.name)))].sort((a, b) => {
+            // digits before letters
+            const aD = /\d/.test(a), bD = /\d/.test(b);
+            if (aD && !bD) return -1;
+            if (!aD && bD) return 1;
+            return a.localeCompare(b, 'sv');
+        });
+
+        letterDropdown.innerHTML = '';
+
+        // "All" option at top
+        const allOpt = document.createElement('button');
+        allOpt.textContent = 'All letters';
+        allOpt.dataset.letter = '';
+        allOpt.classList.add('active'); // default
+        allOpt.addEventListener('click', () => {
+            activeLetter = null;
+            updateLetterDropdownUI();
+            closeDropdown();
+            applyFilters();
+        });
+        letterDropdown.appendChild(allOpt);
+
+        letters.forEach(letter => {
+            const btn = document.createElement('button');
+            btn.textContent = letter;
+            btn.dataset.letter = letter;
+            btn.addEventListener('click', () => {
+    activeLetter = activeLetter === letter ? null : letter;
+
+    // 🔥 NYTT: avaktivera filter-knappar
+    document.querySelectorAll('.filter-btn[data-filter]')
+        .forEach(b => b.classList.remove('active'));
+
+    updateLetterDropdownUI();
+    closeDropdown();
+    applyFilters();
+});
+            letterDropdown.appendChild(btn);
+        });
+    }
+
+    function updateLetterDropdownUI() {
+        // update trigger label
+        letterTrigger.textContent = '';
+        const label = activeLetter ? `Letter: ${activeLetter}` : 'A–Z';
+        letterTrigger.appendChild(document.createTextNode(label + ' '));
+        const chevron = document.createElement('em');
+        chevron.className = 'chevron';
+        chevron.textContent = '▾';
+        letterTrigger.appendChild(chevron);
+        letterTrigger.classList.toggle('active', !!activeLetter);
+
+        // update dropdown option highlights
+        letterDropdown.querySelectorAll('button').forEach(btn => {
+            const isAll = btn.dataset.letter === '';
+            btn.classList.toggle('active', isAll ? !activeLetter : btn.dataset.letter === activeLetter);
+        });
+    }
+
+    // ── Dropdown open/close ───────────────────────────────────────
+    function openDropdown() {
+        letterDropdown.classList.add('open');
+        letterTrigger.classList.add('open');
+    }
+    function closeDropdown() {
+        letterDropdown.classList.remove('open');
+        letterTrigger.classList.remove('open');
+    }
+    letterTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        letterDropdown.classList.contains('open') ? closeDropdown() : openDropdown();
+    });
+    document.addEventListener('click', (e) => {
+        if (!letterTrigger.contains(e.target) && !letterDropdown.contains(e.target)) {
+            closeDropdown();
+        }
+    });
+
+    // ── Core filter + render ──────────────────────────────────────
+    function applyFilters() {
+        // 1. Remove old distance badges
+        allCards.forEach(c => c.querySelectorAll('.dist-badge').forEach(b => b.remove()));
+        activeQuery = normalizeQuery(restaurantSearch.value);
+        restaurantSearchClear.hidden = !restaurantSearch.value.trim();
+
+        // 2. Filter by search, tag + letter
+        let visible = allCards.filter(card => {
+            if (activeQuery && !getCardSearchText(card).includes(activeQuery)) return false;
+            if (activeFilter === 'menu' && !card.dataset.tags.includes('menu')) return false;
+            if (activeLetter) {
+                if (normLetter(card.dataset.name) !== activeLetter) return false;
+            }
+            return true;
+        });
+
+        // 3. Sort + render
+        if (nearbyMode && userLat !== null) {
+            const withDist = visible.map(card => ({
+                card,
+                d: distM(userLat, userLng,
+                    parseFloat(card.dataset.lat),
+                    parseFloat(card.dataset.lng))
+            })).sort((a, b) => a.d - b.d);
+
+            withDist.forEach(({ card, d }) => {
+                grid.appendChild(card);
+                const badge = document.createElement('span');
+                badge.className = 'dist-badge';
+                badge.textContent = '📍 ' + fmtDist(d);
+                card.appendChild(badge);
+                card.style.display = '';
+            });
+
+            allCards.forEach(card => {
+                if (!withDist.find(v => v.card === card)) card.style.display = 'none';
+            });
+
+            nearbyInfo.textContent = `📍 Sorted by distance from you — ${withDist.length} places`;
+            nearbyInfo.classList.add('visible');
+        } else {
+            // alpha sort, then re-append in order
+            const sorted = sortAlpha(visible);
+            sorted.forEach(card => { card.style.display = ''; grid.appendChild(card); });
+            // hide the ones not in visible
+            allCards.forEach(card => {
+                if (!visible.includes(card)) card.style.display = 'none';
+            });
+            nearbyInfo.classList.remove('visible');
+        }
+
+        // 4. No-results placeholder
+        let noRes = grid.querySelector('.no-results');
+        const count = visible.length;
+        if (count === 0 || (nearbyMode && allCards.filter(c => c.style.display !== 'none').length === 0)) {
+            if (!noRes) {
+                noRes = document.createElement('div');
+                noRes.className = 'no-results';
+                noRes.innerHTML = '<span>🍽</span>No places match this filter.';
+                grid.appendChild(noRes);
+            }
+        } else {
+            if (noRes) noRes.remove();
+        }
+    }
+
+    // ── Tag filter buttons ────────────────────────────────────────
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+    btn.addEventListener('click', () => {
+        document.querySelectorAll('.filter-btn[data-filter]').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+
+        activeFilter = btn.dataset.filter;
+
+        // 🔥 FIX: reset letter när man klickar All / Has Menu
+        activeLetter = null;
+        updateLetterDropdownUI();
+
+        applyFilters();
+    });
+});
+
+    // ── Nearby button ─────────────────────────────────────────────
+
+    restaurantSearch.addEventListener('input', runRestaurantSearch);
+    restaurantSearch.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            runRestaurantSearch();
+        }
+    });
+    restaurantSearchButton.addEventListener('click', runRestaurantSearch);
+    restaurantSearchClear.addEventListener('click', () => {
+        restaurantSearch.value = '';
+        runRestaurantSearch();
+        restaurantSearch.focus();
+    });
+    nearbyBtn.addEventListener('click', async () => {
+        if (nearbyMode) {
+            nearbyMode = false;
+            nearbyBtn.classList.remove('nearby-active');
+            nearbyBtn.textContent = '📍 Nearby';
+            applyFilters();
+            return;
+        }
+
+        if (!navigator.geolocation) {
+            alert('Your browser does not support geolocation.');
+            return;
+        }
+
+        nearbyBtn.textContent = '⏳ Locating…';
+        nearbyBtn.disabled = true;
+
+        try {
+            const pos = await new Promise((res, rej) =>
+                navigator.geolocation.getCurrentPosition(res, rej, {
+                    enableHighAccuracy: true, timeout: 10000
+                })
+            );
+            userLat = pos.coords.latitude;
+            userLng = pos.coords.longitude;
+            nearbyMode = true;
+            nearbyBtn.classList.add('nearby-active');
+        } catch {
+            alert('Could not get your location. Check that you have allowed location access in the browser.');
+        } finally {
+            nearbyBtn.textContent = '📍 Nearby';
+            nearbyBtn.disabled = false;
+        }
+
+        applyFilters();
+    });
+
+    // ── Boot ──────────────────────────────────────────────────────
+    // Alpha sort first, collect allCards, build dropdown, apply initial state
+    sortAlpha(Array.from(grid.querySelectorAll('.card'))).forEach(c => grid.appendChild(c));
+    allCards = Array.from(grid.querySelectorAll('.card'));
+    buildLetterDropdown();
+    updateLetterDropdownUI();
+    applyFilters();
+</script>
+
+</body>
+</html>
+

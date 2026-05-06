@@ -1,0 +1,45 @@
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&display=swap');
+
+:root {
+  font-family: 'Manrope', sans-serif;
+  color: #f5f7fb;
+  background: #0f172a;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html, body, #root {
+  margin: 0;
+  min-height: 100%;
+  width: 100%;
+}
+
+body {
+  margin: 0;
+  background:
+    radial-gradient(circle at top left, #1e293b 0%, #0f172a 45%),
+    #0f172a;
+}
+
+h1, h2, h3, p {
+  margin: 0;
+}
+
+.leaflet-popup-content-wrapper {
+  border-radius: 12px;
+  max-width: calc(100vw - 40px);
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.18);
+}
+
+.leaflet-popup-content {
+  width: auto !important;
+  max-width: calc(100vw - 64px);
+  margin: 10px;
+}
+
+.leaflet-popup-content * {
+  box-sizing: border-box;
+}
