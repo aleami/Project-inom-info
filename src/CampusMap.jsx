@@ -1,10 +1,12 @@
-import { useEffect } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import L from "leaflet";
 import {
   MapContainer,
   TileLayer,
   Marker,
   Popup,
+  Polyline,
+  Circle,
   useMap,
   useMapEvents,
 } from "react-leaflet";
@@ -21,6 +23,59 @@ const MAP_BOUNDS = [
   [59.31, 17.96],
   [59.39, 18.12],
 ];
+
+const DIRECTIONS_API_URL = "/api/directions";
+const ARRIVAL_DISTANCE_METERS = 30;
+const WATCH_POSITION_OPTIONS = {
+  enableHighAccuracy: true,
+  timeout: 12000,
+  maximumAge: 5000,
+};
+
+function formatDistance(meters) {
+  if (!Number.isFinite(meters)) return "";
+  if (meters < 1000) return `${Math.round(meters)} m`;
+  return `${(meters / 1000).toFixed(1)} km`;
+}
+
+function formatDuration(seconds) {
+  if (!Number.isFinite(seconds)) return "";
+  const minutes = Math.max(1, Math.round(seconds / 60));
+  if (minutes < 60) return `${minutes} min`;
+  const hours = Math.floor(minutes / 60);
+  const remainingMinutes = minutes % 60;
+  return remainingMinutes ? `${hours} h ${remainingMinutes} min` : `${hours} h`;
+}
+
+function getRouteSummary(route) {
+  return route?.features?.[0]?.properties?.summary || null;
+}
+
+function getRouteLatLngs(route) {
+  const coordinates = route?.features?.[0]?.geometry?.coordinates || [];
+  return coordinates.map(([lng, lat]) => [lat, lng]);
+}
+
+function getRouteSteps(route) {
+  return route?.features?.[0]?.properties?.segments?.[0]?.steps || [];
+}
+
+function getDistanceBetweenPoints(start, end) {
+  if (!start || !end) return Number.POSITIVE_INFINITY;
+
+  const toRadians = (value) => (value * Math.PI) / 180;
+  const earthRadiusMeters = 6371000;
+  const latitudeDelta = toRadians(end.lat - start.latitude);
+  const longitudeDelta = toRadians(end.lng - start.longitude);
+  const startLatitude = toRadians(start.latitude);
+  const endLatitude = toRadians(end.lat);
+
+  const haversine =
+    Math.sin(latitudeDelta / 2) ** 2 +
+    Math.cos(startLatitude) * Math.cos(endLatitude) * Math.sin(longitudeDelta / 2) ** 2;
+
+  return 2 * earthRadiusMeters * Math.atan2(Math.sqrt(haversine), Math.sqrt(1 - haversine));
+}
 
 function createBuildingIcon() {
   return L.divIcon({
@@ -110,6 +165,25 @@ function createRestaurantLogoIcon(place) {
   });
 }
 
+function createUserLocationIcon() {
+  return L.divIcon({
+    className: "",
+    html: `
+      <div style="
+        width: 22px;
+        height: 22px;
+        background: #2563eb;
+        border: 4px solid white;
+        border-radius: 999px;
+        box-shadow: 0 8px 18px rgba(37,99,235,0.35);
+      "></div>
+    `,
+    iconSize: [22, 22],
+    iconAnchor: [11, 11],
+    popupAnchor: [0, -12],
+  });
+}
+
 function isRestaurant(place) {
   return place.type === "restaurant";
 }
@@ -127,6 +201,21 @@ function FlyToSelected({ places, selectedBuildingId }) {
       duration: 1.2,
     });
   }, [map, places, selectedBuildingId]);
+
+  return null;
+}
+
+function FitRouteToBounds({ routeLatLngs }) {
+  const map = useMap();
+
+  useEffect(() => {
+    if (routeLatLngs.length > 1) {
+      map.fitBounds(L.latLngBounds(routeLatLngs), {
+        padding: [56, 56],
+        maxZoom: 18,
+      });
+    }
+  }, [map, routeLatLngs]);
 
   return null;
 }
@@ -160,6 +249,65 @@ function RoomLink({ href, children }) {
     >
       {children}
     </a>
+  );
+}
+
+function formatReservationTime(value) {
+  return new Date(value).toLocaleTimeString("sv-SE", {
+    hour: "2-digit",
+    minute: "2-digit",
+  });
+}
+
+function RoomBookingStatus({ bookingStatus }) {
+  if (!bookingStatus?.isBookable) return null;
+
+  const baseStyle = {
+    fontSize: "12px",
+    fontWeight: 700,
+    marginTop: "6px",
+  };
+
+  if (bookingStatus.isBookedNow && bookingStatus.currentReservation) {
+    return (
+      <div
+        style={{
+          ...baseStyle,
+          color: "#9f1239",
+        }}
+      >
+        Bokad nu {formatReservationTime(bookingStatus.currentReservation.start)}
+        –
+        {formatReservationTime(bookingStatus.currentReservation.end)}
+      </div>
+    );
+  }
+
+  if (bookingStatus.nextReservation) {
+    return (
+      <div
+        style={{
+          ...baseStyle,
+          color: "#166534",
+        }}
+      >
+        Ledig nu · bokad {formatReservationTime(bookingStatus.nextReservation.start)}
+        –
+        {formatReservationTime(bookingStatus.nextReservation.end)}
+      </div>
+    );
+  }
+
+  return (
+    <div
+      style={{
+        ...baseStyle,
+        color: "#166534",
+      }}
+    >
+      Ledig idag
+      {bookingStatus.requiresAccess ? " · kräver access" : ""}
+    </div>
   );
 }
 
@@ -297,15 +445,330 @@ export default function CampusMap({
   selectedBuildingId,
   onSelectBuilding,
 }) {
-  const buildingIcon = createBuildingIcon();
+  const [userPosition, setUserPosition] = useState(null);
+  const [route, setRoute] = useState(null);
+  const [activeNavigationDestination, setActiveNavigationDestination] = useState(null);
+  const [routeMessage, setRouteMessage] = useState(
+    "Aktivera din plats och välj ett mål för navigation."
+  );
+  const [isLocating, setIsLocating] = useState(false);
+  const [isRouting, setIsRouting] = useState(false);
+  const routeRequestId = useRef(0);
+  const navigationSessionId = useRef(0);
+  const watchIdRef = useRef(null);
+
+  const buildingIcon = useMemo(() => createBuildingIcon(), []);
+  const userLocationIcon = useMemo(() => createUserLocationIcon(), []);
+  const routeLatLngs = useMemo(() => getRouteLatLngs(route), [route]);
+  const routeSummary = getRouteSummary(route);
+  const routeSteps = useMemo(() => getRouteSteps(route), [route]);
+  const hasActiveNavigation = Boolean(activeNavigationDestination);
+
+  useEffect(() => {
+    return () => {
+      if (watchIdRef.current !== null && navigator.geolocation) {
+        navigator.geolocation.clearWatch(watchIdRef.current);
+      }
+    };
+  }, []);
+
+  async function requestUserPosition() {
+    if (!navigator.geolocation) {
+      throw new Error("Din webbläsare stödjer inte platsdelning.");
+    }
+
+    return new Promise((resolve, reject) => {
+      navigator.geolocation.getCurrentPosition(
+        (position) =>
+          resolve({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+            accuracy: position.coords.accuracy,
+          }),
+        (error) => reject(new Error(`Kunde inte hämta din plats: ${error.message}`)),
+        { ...WATCH_POSITION_OPTIONS, maximumAge: 30000 }
+      );
+    });
+  }
+
+  function clearNavigationWatch() {
+    if (watchIdRef.current !== null && navigator.geolocation) {
+      navigator.geolocation.clearWatch(watchIdRef.current);
+      watchIdRef.current = null;
+    }
+  }
+
+  function stopNavigation(message = "Navigation stoppad.") {
+    navigationSessionId.current += 1;
+    routeRequestId.current += 1;
+    clearNavigationWatch();
+    setActiveNavigationDestination(null);
+    setRoute(null);
+    setIsLocating(false);
+    setIsRouting(false);
+    setRouteMessage(message);
+  }
+
+  function startNavigationWatch(destination, sessionId) {
+    if (!navigator.geolocation) return;
+
+    clearNavigationWatch();
+    watchIdRef.current = navigator.geolocation.watchPosition(
+      (position) => {
+        if (navigationSessionId.current !== sessionId) return;
+
+        const nextPosition = {
+          latitude: position.coords.latitude,
+          longitude: position.coords.longitude,
+          accuracy: position.coords.accuracy,
+        };
+
+        setUserPosition(nextPosition);
+
+        if (getDistanceBetweenPoints(nextPosition, destination) <= ARRIVAL_DISTANCE_METERS) {
+          stopNavigation(`Du är framme vid ${destination.name}. Navigation avslutad.`);
+        }
+      },
+      () => {
+        if (navigationSessionId.current !== sessionId) return;
+        setRouteMessage(
+          `Navigation till ${destination.name} är igång, men live-positionen kunde inte uppdateras.`
+        );
+      },
+      WATCH_POSITION_OPTIONS
+    );
+  }
+
+  async function fetchRoute(startPosition, destination) {
+    const response = await fetch(DIRECTIONS_API_URL, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        coordinates: [
+          [startPosition.longitude, startPosition.latitude],
+          [destination.lng, destination.lat],
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      const message = await response.text();
+      throw new Error(message || "OpenRouteService kunde inte skapa en rutt.");
+    }
+
+    return response.json();
+  }
+
+  async function routeToPlace(
+    destination,
+    startPosition = userPosition,
+    sessionId = navigationSessionId.current
+  ) {
+    if (!destination) {
+      setRoute(null);
+      setRouteMessage("Välj ett mål på kartan eller i listan.");
+      return;
+    }
+
+    if (!startPosition) {
+      setRoute(null);
+      setRouteMessage("Aktivera din plats för att beräkna gångrutt.");
+      return;
+    }
+
+    const requestId = routeRequestId.current + 1;
+    routeRequestId.current = requestId;
+    setIsRouting(true);
+    setRouteMessage(`Beräknar gångrutt till ${destination.name}...`);
+
+    try {
+      const nextRoute = await fetchRoute(startPosition, destination);
+      if (routeRequestId.current !== requestId || navigationSessionId.current !== sessionId) return;
+
+      setRoute(nextRoute);
+      const summary = getRouteSummary(nextRoute);
+      const distance = formatDistance(summary?.distance);
+      const duration = formatDuration(summary?.duration);
+      setRouteMessage(
+        summary
+          ? `${destination.name}: ${distance} gång, cirka ${duration}.`
+          : `${destination.name}: rutt skapad.`
+      );
+    } catch (error) {
+      if (routeRequestId.current !== requestId || navigationSessionId.current !== sessionId) return;
+      clearNavigationWatch();
+      setActiveNavigationDestination(null);
+      setRoute(null);
+      setRouteMessage(error.message);
+    } finally {
+      if (routeRequestId.current === requestId && navigationSessionId.current === sessionId) {
+        setIsRouting(false);
+      }
+    }
+  }
+
+  async function locateUser() {
+    setIsLocating(true);
+    setRouteMessage("Hämtar din plats...");
+
+    try {
+      const nextPosition = await requestUserPosition();
+      setUserPosition(nextPosition);
+      setRouteMessage(
+        `Plats hittad. Tryck Navigate på ett mål. Noggrannhet ${Math.round(
+          nextPosition.accuracy || 0
+        )} m.`
+      );
+    } catch (error) {
+      setRoute(null);
+      setRouteMessage(error.message);
+    } finally {
+      setIsLocating(false);
+    }
+  }
+
+  async function startNavigation(place) {
+    onSelectBuilding(place.id);
+    const sessionId = navigationSessionId.current + 1;
+    navigationSessionId.current = sessionId;
+    setActiveNavigationDestination(place);
+    setRoute(null);
+
+    if (userPosition) {
+      startNavigationWatch(place, sessionId);
+      await routeToPlace(place, userPosition, sessionId);
+      return;
+    }
+
+    setIsLocating(true);
+    setRouteMessage("Hämtar din plats för navigation...");
+
+    try {
+      const nextPosition = await requestUserPosition();
+      if (navigationSessionId.current !== sessionId) return;
+      setUserPosition(nextPosition);
+      startNavigationWatch(place, sessionId);
+      await routeToPlace(place, nextPosition, sessionId);
+    } catch (error) {
+      if (navigationSessionId.current !== sessionId) return;
+      clearNavigationWatch();
+      setActiveNavigationDestination(null);
+      setRoute(null);
+      setRouteMessage(error.message);
+    } finally {
+      if (navigationSessionId.current === sessionId) {
+        setIsLocating(false);
+      }
+    }
+  }
 
   return (
     <div
       style={{
         borderRadius: "24px",
         overflow: "hidden",
+        position: "relative",
       }}
     >
+      <div
+        style={{
+          position: "absolute",
+          top: "16px",
+          left: "16px",
+          zIndex: 500,
+          width: "min(360px, calc(100% - 32px))",
+          display: "grid",
+          gap: "8px",
+        }}
+      >
+        <button
+          type="button"
+          onClick={locateUser}
+          disabled={isLocating}
+          style={{
+            justifySelf: "start",
+            padding: "10px 14px",
+            border: "1px solid #bfdbfe",
+            borderRadius: "10px",
+            background: isLocating ? "#dbeafe" : "#004791",
+            color: isLocating ? "#1e3a8a" : "white",
+            fontWeight: 800,
+            cursor: isLocating ? "wait" : "pointer",
+            boxShadow: "0 8px 18px rgba(15,23,42,0.14)",
+          }}
+        >
+          {isLocating ? "Hämtar plats..." : "Använd min plats"}
+        </button>
+
+        <div
+          style={{
+            padding: "10px 12px",
+            border: "1px solid #dbeafe",
+            borderRadius: "12px",
+            background: "rgba(255,255,255,0.96)",
+            color: "#0f172a",
+            fontSize: "13px",
+            fontWeight: 700,
+            lineHeight: 1.35,
+            boxShadow: "0 8px 18px rgba(15,23,42,0.12)",
+          }}
+        >
+          {isRouting ? "Rutt beräknas..." : routeMessage}
+          {routeSummary && (
+            <div
+              style={{
+                marginTop: "6px",
+                color: "#004791",
+                fontSize: "12px",
+              }}
+            >
+              {formatDistance(routeSummary.distance)} · {formatDuration(routeSummary.duration)}
+            </div>
+          )}
+          {routeSteps.length > 0 && (
+            <ol
+              style={{
+                margin: "8px 0 0",
+                paddingLeft: "18px",
+                maxHeight: "120px",
+                overflowY: "auto",
+                color: "#334155",
+                fontSize: "12px",
+              }}
+            >
+              {routeSteps.slice(0, 6).map((step, index) => (
+                <li key={`${step.way_points?.join("-") || index}-${step.instruction}`}>
+                  {step.instruction}
+                </li>
+              ))}
+            </ol>
+          )}
+          {hasActiveNavigation && (
+            <button
+              type="button"
+              onClick={() => stopNavigation("Navigation stoppad manuellt.")}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "10px 12px",
+                border: "1px solid #fecaca",
+                borderRadius: "10px",
+                background: "#dc2626",
+                color: "white",
+                fontSize: "13px",
+                fontWeight: 800,
+                cursor: "pointer",
+                boxShadow: "0 8px 18px rgba(220,38,38,0.18)",
+              }}
+            >
+              Stoppa navigation
+            </button>
+          )}
+        </div>
+      </div>
+
       <MapContainer
         center={[59.3493, 18.0712]}
         zoom={16}
@@ -328,7 +791,44 @@ export default function CampusMap({
           places={places}
           selectedBuildingId={selectedBuildingId}
         />
+        <FitRouteToBounds
+          routeLatLngs={routeLatLngs}
+        />
         <KeepPopupSizedAfterZoom />
+
+        {userPosition && (
+          <>
+            <Marker
+              position={[userPosition.latitude, userPosition.longitude]}
+              icon={userLocationIcon}
+            >
+              <Popup>Du är här</Popup>
+            </Marker>
+            <Circle
+              center={[userPosition.latitude, userPosition.longitude]}
+              radius={userPosition.accuracy || 25}
+              pathOptions={{
+                color: "#2563eb",
+                weight: 1,
+                fillColor: "#2563eb",
+                fillOpacity: 0.12,
+              }}
+            />
+          </>
+        )}
+
+        {routeLatLngs.length > 1 && (
+          <Polyline
+            positions={routeLatLngs}
+            pathOptions={{
+              color: "#16a34a",
+              weight: 6,
+              opacity: 0.9,
+              lineCap: "round",
+              lineJoin: "round",
+            }}
+          />
+        )}
 
         {places.map((place) => {
           const restaurant = isRestaurant(place);
@@ -386,6 +886,48 @@ export default function CampusMap({
                     >
                       <strong>Öppettider:</strong> {place.openingHours}
                     </div>
+                  )}
+
+                  {activeNavigationDestination?.id === place.id ? (
+                    <button
+                      type="button"
+                      onClick={() => stopNavigation("Navigation stoppad manuellt.")}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "1px solid #fecaca",
+                        borderRadius: "10px",
+                        background: "#dc2626",
+                        color: "white",
+                        fontSize: "14px",
+                        fontWeight: 800,
+                        cursor: "pointer",
+                        marginBottom: "10px",
+                        boxShadow: "0 8px 16px rgba(220,38,38,0.16)",
+                      }}
+                    >
+                      Stoppa navigation
+                    </button>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => startNavigation(place)}
+                      disabled={isLocating || isRouting}
+                      style={{
+                        width: "100%",
+                        padding: "10px 12px",
+                        border: "none",
+                        borderRadius: "10px",
+                        background: isLocating || isRouting ? "#dbeafe" : "#16a34a",
+                        color: isLocating || isRouting ? "#1e3a8a" : "white",
+                        fontSize: "14px",
+                        fontWeight: 800,
+                        cursor: isLocating || isRouting ? "wait" : "pointer",
+                        marginBottom: "10px",
+                      }}
+                    >
+                      {isLocating || isRouting ? "Startar navigation..." : "Navigate"}
+                    </button>
                   )}
 
                   {restaurant && <RestaurantLinks place={place} />}
@@ -453,6 +995,8 @@ export default function CampusMap({
                               <RoomLink href={room.source}>KTH Places</RoomLink>
                             </div>
                           )}
+
+                          <RoomBookingStatus bookingStatus={room.bookingStatus} />
                         </div>
                       ))}
                     </div>

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -31,24 +31,73 @@
 <div class="search-container">
     <div class="search-row">
         <div class="search-box" id="searchBox">
-            <input id="searchInput" type="text" placeholder="Search buildings, sections, microwaves, or printers...">
+            <input id="searchInput" type="text" placeholder="Search CampusFinder">
             <span class="close-icon" id="clearSearchButton">x</span>
-            <button id="searchButton" type="button">Search</button>
+            <button id="searchButton" type="button" aria-label="Search CampusFinder">
+                <span class="search-button-icon" aria-hidden="true"></span>
+            </button>
             <div id="resultsDropdown" class="results-dropdown"></div>
         </div>
-        <button id="locateButton" class="locate-button" type="button">My location</button>
     </div>
 
-    <div id="statusMessage" class="status-message">Loading campus data...</div>
-    <div id="routeMessage" class="route-message">Select a building to see a walking trail.</div>
+    <div class="map-actions">
+                <button id="nearbyToggleButton" class="nearby-button" type="button" aria-expanded="false" aria-controls="nearbyPanel">Nearby</button>
+    </div>
 
-    <div id="highlightsPanel" class="highlights-panel">
-        <div class="highlights-panel-header">
-            <h2>Highlights nearby</h2>
-            <span id="highlightsMeta">Waiting for location...</span>
+    <div class="category-filters-wrap">
+        <div class="category-filters" id="categoryFilters" aria-label="Map categories">
+            <button class="category-chip" type="button" data-category="all">All</button>
+            <button class="category-chip" type="button" data-category="buildings">Buildings</button>
+            <button class="category-chip" type="button" data-category="bookable">Bookable rooms</button>
+            <button class="category-chip" type="button" data-category="microwaves">Microwaves</button>
+            <button class="category-chip" type="button" data-category="printers">Printers</button>
+            <button class="category-chip" type="button" data-category="restaurants">Restaurants</button>
         </div>
-        <div id="highlightsList" class="highlights-list">
-            <div class="highlight-item muted">Allow location access to see distances to all places.</div>
+        <div class="category-scroll-hint" id="categoryScrollHint" aria-hidden="true">
+            <button class="category-scroll-button" id="categoryScrollButton" type="button" aria-label="Show more filters">
+                <strong>&rarr;</strong>
+            </button>
+        </div>
+    </div>
+
+    <div id="statusMessage" class="status-message" hidden>Loading campus data...</div>
+    <div id="routeMessage" class="route-message">Select a building to see a walking trail.</div>
+    <button id="stopNavigationButton" class="stop-navigation-button" type="button" hidden>Stop navigation</button>
+
+    <section id="popularPlaces" class="popular-restaurants" hidden aria-label="Popular places right now">
+        <div class="popular-restaurants-header">
+            <div>
+                <span id="popularPlacesEyebrow">Populärt just nu</span>
+                <strong id="popularPlacesTitle">Studentfavoriter nära campus</strong>
+            </div>
+            <em>Top 3</em>
+        </div>
+        <div id="popularPlacesList" class="popular-restaurants-list"></div>
+    </section>
+
+    <div id="nearbyPanel" class="nearby-panel" hidden>
+        <div class="nearby-panel-header">
+            <h2>Nearby</h2>
+            <span id="nearbyMeta">Choose a filter</span>
+        </div>
+        <div class="nearby-filters-wrap">
+            <div class="nearby-filters" id="nearbyFilters" aria-label="Nearby filters">
+                <button class="nearby-chip" type="button" data-nearby-category="all">All</button>
+                <button class="nearby-chip" type="button" data-nearby-category="availableBookable">Available rooms</button>
+                <button class="nearby-chip" type="button" data-nearby-category="bookable">Bookable rooms</button>
+                <button class="nearby-chip" type="button" data-nearby-category="restaurants">Restaurants</button>
+                <button class="nearby-chip" type="button" data-nearby-category="buildings">Buildings</button>
+                <button class="nearby-chip" type="button" data-nearby-category="microwaves">Microwaves</button>
+                <button class="nearby-chip" type="button" data-nearby-category="printers">Printers</button>
+            </div>
+            <div class="nearby-scroll-hint" id="nearbyScrollHint" aria-hidden="true" hidden>
+                <button class="nearby-scroll-button" id="nearbyScrollButton" type="button" aria-label="Show more nearby filters">
+                    <strong>&rarr;</strong>
+                </button>
+            </div>
+        </div>
+        <div id="nearbyList" class="nearby-list">
+            <div class="nearby-item muted">Choose what you want to find nearby.</div>
         </div>
     </div>
 </div>
@@ -60,7 +109,7 @@
 <!-- Leaflet JS from CDN -->
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-    // ── Inlined distance.js functions ──────────────────────────────────────
+    // â”€â”€ Inlined distance.js functions â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
     function calculateDistanceInMeters(lat1, lng1, lat2, lng2) {
         const R = 6371000;
         const toRad = deg => deg * Math.PI / 180;
@@ -94,7 +143,7 @@
             );
         });
     }
-    // ───────────────────────────────────────────────────────────────────────
+    // â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€â”€
 
     const pageParams = new URLSearchParams(window.location.search);
     const isPreviewMode = pageParams.get('preview') === '1';
@@ -102,27 +151,64 @@
         document.body.classList.add('preview-mode');
     }
 
-    const API_URL = '../data/places.json';
+    const PLACES_DATA_VERSION = '2026-05-05';
+    const API_URL = `../data/places.json?v=${PLACES_DATA_VERSION}`;
+    const backendProtocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const backendHost = window.location.hostname || '127.0.0.1';
+    const API_BASE_URL = window.location.port === '5173'
+        ? '/api'
+        : `${backendProtocol}//${backendHost}:5001/api`;
+    const ROOM_SCHEDULE_API_URL = `${API_BASE_URL}/room-schedule?dayOffset=0`;
+    const DIRECTIONS_API_URL = `${API_BASE_URL}/directions`;
     const input = document.getElementById('searchInput');
     const box = document.getElementById('searchBox');
     const dropdown = document.getElementById('resultsDropdown');
     const statusMessage = document.getElementById('statusMessage');
     const searchButton = document.getElementById('searchButton');
     const clearSearchButton = document.getElementById('clearSearchButton');
-    const locateButton = document.getElementById('locateButton');
-    const highlightsList = document.getElementById('highlightsList');
-    const highlightsMeta = document.getElementById('highlightsMeta');
+    const nearbyToggleButton = document.getElementById('nearbyToggleButton');
+    const nearbyPanel = document.getElementById('nearbyPanel');
+    const nearbyFilters = document.getElementById('nearbyFilters');
+    const nearbyScrollHint = document.getElementById('nearbyScrollHint');
+    const nearbyScrollButton = document.getElementById('nearbyScrollButton');
+    const nearbyList = document.getElementById('nearbyList');
+    const nearbyMeta = document.getElementById('nearbyMeta');
+    const categoryFilters = document.getElementById('categoryFilters');
+    const categoryScrollHint = document.getElementById('categoryScrollHint');
+    const categoryScrollButton = document.getElementById('categoryScrollButton');
     const routeMessage = document.getElementById('routeMessage');
+    const stopNavigationButton = document.getElementById('stopNavigationButton');
+    const popularPlaces = document.getElementById('popularPlaces');
+    const popularPlacesList = document.getElementById('popularPlacesList');
+    const popularPlacesEyebrow = document.getElementById('popularPlacesEyebrow');
+    const popularPlacesTitle = document.getElementById('popularPlacesTitle');
 
+    const NEARBY_RESULT_LIMIT = 8;
+    const POPULAR_RESTAURANT_IDS = [
+        'bullens-bar',
+        'subway-danderydsgatan',
+        'krumel-cookies'
+    ];
+    const POPULAR_BUILDING_IDS = [
+        'building-25',
+        'building-59',
+        'building-39'
+    ];
     let places = [];
     let buildingMarkers = [];
-    let microwaveMarkers = [];
     let sectionMarkers = [];
     let userLocation = null;
     let userMarker = null;
     let userAccuracyCircle = null;
     let activeRoute = null;
     let activeDestinationId = null;
+    let activeDestination = null;
+    let navigationWatchId = null;
+    let activeCategory = null;
+    let activeNearbyCategory = null;
+    let nearbyPanelOpen = false;
+    let visiblePlaces = [];
+    let paramDestinationMarker = null;
 
     const CAMPUS_PATH_NODES = {
         southWestGate: [59.34772, 18.07162],
@@ -156,7 +242,15 @@
         ['libraryLink', 'southPlaza']
     ];
 
-    const map = L.map('campusMap').setView([59.3493, 18.0712], 16);
+    const map = L.map('campusMap', {
+        minZoom: 13,
+        keyboard: false,
+        closePopupOnClick: false
+    }).setView([59.3493, 18.0712], 16);
+
+    map.on('zoomend resize', () => {
+        if (map._popup) map._popup.update();
+    });
 
     L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
         attribution: '&copy; OpenStreetMap contributors & CartoDB',
@@ -171,13 +265,53 @@
         popupAnchor: [0, -12]
     });
 
-    const microwaveIcon = L.divIcon({
-        className: '',
-        html: '<div class="microwave-marker">M</div>',
-        iconSize: [28, 28],
-        iconAnchor: [14, 14],
-        popupAnchor: [0, -14]
-    });
+    function getMicrowaveIcon(count = 1) {
+        const badge = count > 1 ? `<span class="microwave-marker-badge">${count}</span>` : '';
+        return L.divIcon({
+            className: '',
+            html: `
+                <div class="microwave-logo-marker">
+                    <img src="../images/microwave.png" alt="">
+                    ${badge}
+                </div>
+            `,
+            iconSize: [46, 46],
+            iconAnchor: [23, 23],
+            popupAnchor: [0, -20]
+        });
+    }
+
+    function getPrinterIcon(count = 1) {
+        const badge = count > 1 ? `<span class="printer-marker-badge">${count}</span>` : '';
+        return L.divIcon({
+            className: '',
+            html: `
+                <div class="printer-logo-marker">
+                    <span class="printer-logo-icon" aria-hidden="true">
+                        <span class="printer-logo-top"></span>
+                        <span class="printer-logo-paper"></span>
+                        <span class="printer-logo-body"></span>
+                        <span class="printer-logo-slot"></span>
+                        <span class="printer-logo-dot printer-logo-dot-left"></span>
+                        <span class="printer-logo-dot printer-logo-dot-right"></span>
+                    </span>
+                    ${badge}
+                </div>
+            `,
+            iconSize: [46, 46],
+            iconAnchor: [23, 23],
+            popupAnchor: [0, -20]
+        });
+    }
+
+    const popupOptions = {
+        minWidth: 240,
+        maxWidth: 300,
+        closeOnClick: false,
+        keepInView: true,
+        autoPan: true,
+        autoPanPadding: [18, 18]
+    };
 
     function getSectionIcon(section) {
         if (section.logoUrl) {
@@ -188,9 +322,30 @@
                 popupAnchor: [0, -16]
             });
         }
+        const sectionCode = escapeHtml(section.logoText || section.shortName || 'SEC').toUpperCase();
+        const sectionVariant = sectionCode === 'THS'
+            ? 'section-marker-ths'
+            : sectionCode === 'TR'
+                ? 'section-marker-tr'
+                : 'section-marker-default';
+
         return L.divIcon({
             className: '',
-            html: `<div class="section-marker">${escapeHtml(section.logoText || section.shortName || 'SEC')}</div>`,
+            html: `<div class="section-marker ${sectionVariant}"><span>${sectionCode}</span></div>`,
+            iconSize: [34, 34],
+            iconAnchor: [17, 17],
+            popupAnchor: [0, -16]
+        });
+    }
+
+    function isTHSPlace(place) {
+        return place.id === 'building-59' || (place.name || '').toLowerCase() === 'k\u00e5rhuset';
+    }
+
+    function getTHSBuildingIcon() {
+        return L.divIcon({
+            className: '',
+            html: '<div class="section-marker section-marker-ths"><span>THS</span></div>',
             iconSize: [34, 34],
             iconAnchor: [17, 17],
             popupAnchor: [0, -16]
@@ -202,10 +357,110 @@
         'kiosk': '../images/kiosk.png',
         'murad-kiosken': '../images/kiosk.png',
         'tekniska-tunnelbana': '../images/sl.gif',
-        'la-campus': '../images/la-campus-logo.png',
-        'syster-o-bror': '../images/syster-o-bror-logo.png',
-        'brazilia': '../images/logo_brazilia.png',
-        'nymble': '../images/nymble.jpg'
+        'stockholms-ostra-roslagsbanan': '../images/sl.gif',
+        'la-campus': '../images/food.png',
+        'syster-o-bror': '../images/food.png',
+        'brazilia': '../images/food.png',
+        'nymble': '../images/food.png',
+        'jarnvagsrestaurangen-ostra-station': '../images/food.png',
+        'ths-cafe': '../images/food.png',
+        'oasen-bar': '../images/food.png',
+        'the-coffice': '../images/food.png',
+        'taste-by-nordrest-kth': '../images/food.png',
+        'fika-cafe': '../images/food.png',
+        'bullens-bar': '../images/food.png',
+        'corella-bar-pizzeria': '../images/food.png',
+        'espresso-house': '../images/food.png',
+        'matcha-ya': '../images/food.png',
+        'one-more-vietnamese': '../images/food.png',
+        'panini-internazionale': '../images/food.png',
+        'ostra-bageriet': '../images/food.png',
+        'cypern': '../images/food.png',
+        'kebab-kitchen': '../images/food.png',
+        'mutto-sushi': '../images/food.png',
+        'asian-wokhouse': '../images/food.png',
+        'krumel-cookies': '../images/food.png',
+        'dino-pizzeria': '../images/food.png',
+        'tekniska-kiosken': '../images/kiosk.png',
+        'parla-sushi': '../images/food.png',
+        'two-fat-ladies': '../images/food.png',
+        'cyba-thai-food': '../images/food.png',
+        'handlarn-tekniska': '../images/kiosk.png',
+        'tekniska-tobak': '../images/kiosk.png',
+        'cafe-doppio': '../images/food.png',
+        'pressbyran-tekniska-hogskolan': '../images/pressbyran-logo.png',
+        'hao-kok': '../images/food.png',
+        'bullar-brod': '../images/food.png',
+        'ostra-stations-godis-tobak': '../images/kiosk.png',
+        'himalaya-livsmedelsbutik': '../images/kiosk.png',
+        'damascus-deli': '../images/kiosk.png',
+        'vallhallagrillen': '../images/food.png',
+        'stories-kth': '../images/food.png',
+        'cafe-bellevue': '../images/food.png',
+        'vardshuset-kraftan': '../images/food.png',
+        'restaurang-entre-albanova': '../images/food.png',
+        'pressbyran-albano': '../images/pressbyran-logo.png',
+        'the-coffice-albano': '../images/food.png',
+        'proviant-cafe-albano': '../images/food.png',
+        'proviant-albano': '../images/food.png',
+        't-snabben': '../images/kiosk.png',
+        'subway-danderydsgatan': '../images/food.png',
+    };
+
+
+    const restaurantCategories = {
+        '7eleven': { label: '7-Eleven', icon: '', logo: '../images/seven-eleven-logo.png' },
+        'kiosk': { label: 'Kiosk', icon: '🛒' },
+        'murad-kiosken': { label: 'Kiosk', icon: '🛒' },
+        'tekniska-tunnelbana': { label: 'SL tunnelbana', icon: '', logo: '../images/sl.gif' },
+        'stockholms-ostra-roslagsbanan': { label: 'SL Roslagsbanan', icon: '', logo: '../images/sl.gif' },
+        'la-campus': { label: 'Lunchrestaurang', icon: '🍽️' },
+        'syster-o-bror': { label: 'Restaurang & café', icon: '🍽️' },
+        'brazilia': { label: 'Lunchrestaurang', icon: '🍽️' },
+        'nymble': { label: 'Studentrestaurang', icon: '🍽️' },
+        'jarnvagsrestaurangen-ostra-station': { label: 'Klassisk restaurang', icon: '🍽️' },
+        'ths-cafe': { label: 'Café', icon: '☕' },
+        'oasen-bar': { label: 'Bar & studenthäng', icon: '🍻' },
+        'the-coffice': { label: 'Café', icon: '☕' },
+        'taste-by-nordrest-kth': { label: 'Lunchrestaurang', icon: '🍽️' },
+        'fika-cafe': { label: 'Café', icon: '☕' },
+        'bullens-bar': { label: 'Bar & restaurang', icon: '🍻' },
+        'corella-bar-pizzeria': { label: 'Pizzeria', icon: '🍕' },
+        'espresso-house': { label: 'Café', icon: '☕' },
+        'matcha-ya': { label: 'Japanskt café', icon: '🍵' },
+        'one-more-vietnamese': { label: 'Asiatiskt', icon: '🥢' },
+        'panini-internazionale': { label: 'Café & mackor', icon: '🥪' },
+        'ostra-bageriet': { label: 'Bageri & café', icon: '🥐' },
+        'cypern': { label: 'Medelhavsmat', icon: '🍽️' },
+        'kebab-kitchen': { label: 'Kebab & grill', icon: '🥙' },
+        'mutto-sushi': { label: 'Sushi', icon: '🍣' },
+        'asian-wokhouse': { label: 'Asiatiskt', icon: '🥢' },
+        'krumel-cookies': { label: 'Café & cookies', icon: '🍪' },
+        'dino-pizzeria': { label: 'Pizzeria', icon: '🍕' },
+        'tekniska-kiosken': { label: 'Kiosk', icon: '🛒' },
+        'parla-sushi': { label: 'Sushi', icon: '🍣' },
+        'two-fat-ladies': { label: 'Café', icon: '☕' },
+        'cyba-thai-food': { label: 'Thaimat', icon: '🥢' },
+        'handlarn-tekniska': { label: 'Kiosk & livs', icon: '🛒' },
+        'tekniska-tobak': { label: 'Tobak & kiosk', icon: '🛒' },
+        'cafe-doppio': { label: 'Café', icon: '☕' },
+        'pressbyran-tekniska-hogskolan': { label: 'Pressbyrån', icon: '', logo: '../images/pressbyran-logo.png' },
+        'hao-kok': { label: 'Asiatiskt', icon: '🥢' },
+        'bullar-brod': { label: 'Bageri & café', icon: '🥐' },
+        'ostra-stations-godis-tobak': { label: 'Godis & tobak', icon: '🍬' },
+        'himalaya-livsmedelsbutik': { label: 'Livs & kiosk', icon: '🛒' },
+        'damascus-deli': { label: 'Deli', icon: '🥙' },
+        'vallhallagrillen': { label: 'Grill', icon: '🔥' },
+        'stories-kth': { label: 'Café', icon: '☕' },
+        'cafe-bellevue': { label: 'Café', icon: '☕' },
+        'vardshuset-kraftan': { label: 'Lunch & värdshus', icon: '🍽️' },
+        'restaurang-entre-albanova': { label: 'Lunchrestaurang', icon: '🍽️' },
+        'pressbyran-albano': { label: 'Pressbyrån', icon: '', logo: '../images/pressbyran-logo.png' },
+        'the-coffice-albano': { label: 'Café & arbetsplats', icon: '☕' },
+        'proviant-cafe-albano': { label: 'Café & bageri', icon: '🥐' },
+        'proviant-albano': { label: 'Restaurang, café & pub', icon: '🍽️' },
+        't-snabben': { label: 'T-Snabben kiosk', icon: '🛒' },
+        'subway-danderydsgatan': { label: 'Snabbmat & mackor', icon: '🥪' },
     };
 
     const restaurantLinks = {
@@ -219,30 +474,79 @@
         },
         '7eleven': { website: 'https://www.7-eleven.se/' },
         'tekniska-tunnelbana': { website: 'https://sl.se/' },
+        'stockholms-ostra-roslagsbanan': { website: 'https://sl.se/' },
         'syster-o-bror': { website: 'https://systerobror.se/' },
-        'la-campus': { website: 'https://www.lacampus.se/' }
+        'la-campus': { website: 'https://www.lacampus.se/' },
+        'bullens-bar': { website: 'https://www.bullensbar.se/' },
+        'corella-bar-pizzeria': { website: 'https://www.corella.se/' },
+        'espresso-house': { website: 'https://espressohouse.com/' },
+        'matcha-ya': { website: 'https://www.matchaya.se/' },
+        'one-more-vietnamese': { website: 'https://www.onemorerestaurant.se/' },
+        'panini-internazionale': { website: 'https://panini.nu/' },
+        'cypern': { website: 'https://restaurangcypern.se/' },
+        'kebab-kitchen': { website: 'https://kebabkitchen.se/' },
+        'mutto-sushi': { website: 'https://muttosushi.com/' },
+        'krumel-cookies': { website: 'https://krumelcookies.com/' },
+        'dino-pizzeria': { website: 'http://www.dinopizzeria.se/' },
+        'parla-sushi': { website: 'https://www.parlasushi.se/' },
+        'two-fat-ladies': { website: 'https://www.twofatladies.se/' },
+        'cafe-doppio': { website: 'https://cafedoppio.se/' },
+        'pressbyran-tekniska-hogskolan': { website: 'https://www.pressbyran.se/' },
+        'hao-kok': { website: 'https://www.haokokse.com/' },
+        'bullar-brod': { website: 'https://www.bullarochbrod.se/' },
+        'stories-kth': { website: 'https://storiescafe.se/kth/' },
+        'cafe-bellevue': { website: 'https://bellevuekonferens.se/kafe.html' },
+        'vardshuset-kraftan': { website: 'https://kraftan.nu/' },
+        'restaurang-entre-albanova': { menu: 'https://www.fagelangenscatering.se/lunch-restaurang-albanova/' },
+        'pressbyran-albano': { website: 'https://www.pressbyran.se/' },
+        'proviant-cafe-albano': { website: 'https://proviantalbano.se/' },
+        'proviant-albano': { website: 'https://proviantalbano.se/' },
+        'subway-danderydsgatan': { website: 'https://www.subway.com/sv-se/' },
     };
 
     function isRestaurant(place) {
         return place.type === 'restaurant';
     }
 
-    function getRestaurantIcon(place) {
-        const logo = restaurantLogos[place.id];
-        if (!logo) {
-            return L.divIcon({
-                className: '',
-                html: '<div class="restaurant-marker">R</div>',
-                iconSize: [36, 36],
-                iconAnchor: [18, 18],
-                popupAnchor: [0, -16]
+    function getRestaurantCategory(place) {
+        return restaurantCategories[place.id] || { label: 'Mat & dryck', icon: '🍽️' };
+    }
+
+    function getRenderableSections(place) {
+        if (isTHSPlace(place)) {
+            return [];
+        }
+
+        const sections = [...(place.sections || [])];
+
+        if (place.id === 'nymble' && !sections.some(section => (section.logoText || section.shortName || '').toUpperCase() === 'THS')) {
+            sections.push({
+                id: 'ths-nymble',
+                name: 'THS',
+                shortName: 'THS',
+                logoText: 'THS',
+                buildingName: 'Nymble',
+                lat: 59.34728092298196,
+                lng: 18.071147192003597,
+                mapsUrl: 'http://www.google.com/maps/place/59.34728092298196,18.071147192003597/&zoom=17',
+                description: 'Student union building at Nymble.'
             });
         }
-        return L.icon({
-            iconUrl: logo,
-            iconSize: [42, 42],
-            iconAnchor: [21, 21],
-            popupAnchor: [0, -18]
+
+        return sections;
+    }
+
+    function getRestaurantIcon(place) {
+        const category = getRestaurantCategory(place);
+        const markerContent = category.logo
+            ? `<img src="${escapeHtml(category.logo)}" alt="${escapeHtml(category.label)}" style="width:auto!important;height:auto!important;max-width:34px!important;max-height:28px!important;object-fit:contain!important;">`
+            : `<span>${category.icon}</span>`;
+        return L.divIcon({
+            className: '',
+            html: `<div class="restaurant-logo-marker" title="${escapeHtml(category.label)}">${markerContent}</div>`,
+            iconSize: [46, 46],
+            iconAnchor: [23, 23],
+            popupAnchor: [0, -20]
         });
     }
 
@@ -250,7 +554,209 @@
         return String(value || '')
             .normalize('NFD')
             .replace(/[\u0300-\u036f]/g, '')
+            .replace(/[^a-zA-Z0-9]+/g, ' ')
+            .replace(/\s+/g, ' ')
+            .trim()
             .toLowerCase();
+    }
+
+    function compactSearchText(value) {
+        return normalizeSearchText(value).replace(/\s+/g, '');
+    }
+
+    function getSearchVariants(value) {
+        const normalized = normalizeSearchText(value);
+        const compact = compactSearchText(value);
+        const variants = new Set([normalized, compact]);
+        const letterHouseMatch = normalized.match(/^([a-z])\s*huset$/i);
+
+        if (letterHouseMatch) {
+            const letter = letterHouseMatch[1].toLowerCase();
+            variants.add(`${letter}huset`);
+            variants.add(`${letter} huset`);
+            variants.add(`${letter} hus`);
+            variants.add(`${letter}hus`);
+            variants.add(`${letter}-huset`);
+        }
+
+        const groupRoomMatch = normalized.match(/^([a-z])\s*grupprum\s*(\d+)$/i);
+        if (groupRoomMatch) {
+            const [, letter, roomNumber] = groupRoomMatch;
+            variants.add(`${letter.toLowerCase()}grupprum${roomNumber}`);
+            variants.add(`${letter.toLowerCase()} grupprum ${roomNumber}`);
+        }
+
+        return [...variants].filter(Boolean);
+    }
+
+    function normalizeRoomName(value) {
+        return String(value || '')
+            .trim()
+            .replace(/\s*\(.*?\)\s*/g, '')
+            .toUpperCase();
+    }
+
+    function getPlaceBuildingCode(place) {
+        const match = String(place.name || '').match(/^([A-Z])-/i);
+        return match ? match[1].toUpperCase() : null;
+    }
+
+    function getCurrentAndNextReservation(reservedTimes) {
+        const now = new Date();
+        const reservations = [...(reservedTimes || [])]
+            .sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        let currentReservation = null;
+        let nextReservation = null;
+
+        for (const reservation of reservations) {
+            const start = new Date(reservation.start);
+            const end = new Date(reservation.end);
+
+            if (start <= now && now < end) {
+                currentReservation = reservation;
+                break;
+            }
+
+            if (start > now) {
+                nextReservation = reservation;
+                break;
+            }
+        }
+
+        return { currentReservation, nextReservation };
+    }
+
+    function createBookingStatus(scheduleRoom) {
+        if (!scheduleRoom || scheduleRoom.hide) return null;
+
+        const { currentReservation, nextReservation } = getCurrentAndNextReservation(scheduleRoom.reservedTimes);
+
+        return {
+            isBookable: true,
+            requiresAccess: !!scheduleRoom.requiresAccess,
+            isBookedNow: !!currentReservation,
+            currentReservation,
+            nextReservation
+        };
+    }
+
+    function formatReservationTime(value) {
+        return new Date(value).toLocaleTimeString('sv-SE', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    }
+
+    function formatBookingStatus(bookingStatus) {
+        if (!bookingStatus || !bookingStatus.isBookable) return null;
+
+        if (bookingStatus.isBookedNow && bookingStatus.currentReservation) {
+            return {
+                text: `Booked now ${formatReservationTime(bookingStatus.currentReservation.start)}-${formatReservationTime(bookingStatus.currentReservation.end)}`,
+                className: 'booked'
+            };
+        }
+
+        if (bookingStatus.nextReservation) {
+            return {
+                text: `Free now, booked ${formatReservationTime(bookingStatus.nextReservation.start)}-${formatReservationTime(bookingStatus.nextReservation.end)}`,
+                className: 'free'
+            };
+        }
+
+        return {
+            text: bookingStatus.requiresAccess ? 'Free today, requires access' : 'Free today',
+            className: 'free'
+        };
+    }
+
+    function isGroupRoomSearch(query) {
+        return [
+            'grupprum',
+            'group room',
+            'group-room',
+            'bookable',
+            'bokningsbar',
+            'studierum'
+        ].some(keyword => query.includes(keyword));
+    }
+
+    function roomMatchesQuery(room, query) {
+        if (!query) return false;
+
+        const bookingStatus = formatBookingStatus(room.bookingStatus);
+        const text = normalizeSearchText([
+            room.name,
+            room.address,
+            room.buildingName,
+            room.type,
+            room.notes,
+            bookingStatus && bookingStatus.text
+        ].join(' '));
+
+        if (text.includes(query)) return true;
+
+        return isGroupRoomSearch(query) && (
+            room.type === 'group-room' ||
+            room.type === 'bookable-room' ||
+            !!room.bookingStatus
+        );
+    }
+
+    function mergePlacesWithSchedule(basePlaces, scheduleBuildings) {
+        if (!scheduleBuildings || !scheduleBuildings.length) {
+            return basePlaces;
+        }
+
+        const scheduleByBuildingCode = new Map(
+            scheduleBuildings.map(building => [String(building.name || '').toUpperCase(), building])
+        );
+
+        return basePlaces.map(place => {
+            if (isRestaurant(place)) return place;
+
+            const buildingCode = getPlaceBuildingCode(place);
+            const scheduleBuilding = buildingCode ? scheduleByBuildingCode.get(buildingCode) : null;
+
+            if (!scheduleBuilding) return place;
+
+            const scheduleRooms = new Map(
+                (scheduleBuilding.rooms || [])
+                    .filter(room => !room.hide)
+                    .map(room => [normalizeRoomName(room.name), room])
+            );
+
+            const mergedRooms = (place.rooms || []).map(room => ({
+                ...room,
+                bookingStatus: createBookingStatus(scheduleRooms.get(normalizeRoomName(room.name)))
+            }));
+
+            for (const scheduleRoom of scheduleRooms.values()) {
+                const roomName = normalizeRoomName(scheduleRoom.name);
+                const alreadyExists = mergedRooms.some(room => normalizeRoomName(room.name) === roomName);
+
+                if (alreadyExists) continue;
+
+                mergedRooms.push({
+                    id: scheduleRoom.externalId || `${place.id}-${roomName.toLowerCase()}`,
+                    name: scheduleRoom.name,
+                    type: 'bookable-room',
+                    seats: 0,
+                    available: false,
+                    notes: scheduleRoom.requiresAccess ? 'Requires access' : 'Bookable room',
+                    bookingStatus: createBookingStatus(scheduleRoom)
+                });
+            }
+
+            mergedRooms.sort((a, b) => a.name.localeCompare(b.name, undefined, { numeric: true }));
+
+            return {
+                ...place,
+                rooms: mergedRooms,
+                roomCount: Math.max(place.roomCount || 0, mergedRooms.length)
+            };
+        });
     }
 
     function escapeHtml(value) {
@@ -271,94 +777,321 @@
     }
 
     function getPlaceSearchText(place) {
-        return normalizeSearchText([
+        return [
             place.name,
             place.searchText,
             ...(place.addresses || []),
-            ...(place.rooms || []).flatMap(room => [room.name, room.address, room.buildingName]),
-            ...((place.microwaves && place.microwaves.locations) || []).flatMap(l => [l.name, l.address]),
-            ...((place.printers && place.printers.locations) || []).flatMap(l => [l.name, l.address]),
-            ...(place.sections || []).flatMap(s => [s.name, s.shortName, s.buildingName, s.description])
-        ].join(' '));
+            ...(place.rooms || []).flatMap(room => {
+                const bookingStatus = formatBookingStatus(room.bookingStatus);
+                return [
+                    room.name,
+                    ...getSearchVariants(room.name),
+                    room.address,
+                    room.buildingName,
+                    ...getSearchVariants(room.buildingName),
+                    room.type,
+                    room.notes,
+                    bookingStatus && bookingStatus.text
+                ];
+            }),
+            ...getSearchVariants(place.name),
+            ...((place.microwaves && place.microwaves.locations) || []).flatMap(l => [l.name, ...getSearchVariants(l.name), l.address]),
+            ...((place.printers && place.printers.locations) || []).flatMap(l => [l.name, ...getSearchVariants(l.name), l.address]),
+            ...(place.sections || []).flatMap(s => [s.name, ...getSearchVariants(s.name), s.shortName, s.buildingName, ...getSearchVariants(s.buildingName), s.description])
+        ].join(' ');
     }
 
-    function getPopupHtml(place) {
-        const distanceInMeters = getDistanceForPlace(place);
+    function searchTextMatches(haystack, query) {
+        const normalizedHaystack = normalizeSearchText(haystack);
+        const compactHaystack = compactSearchText(haystack);
+        const normalizedQuery = normalizeSearchText(query);
+        const compactQuery = compactSearchText(query);
 
+        return normalizedHaystack.includes(normalizedQuery) || compactHaystack.includes(compactQuery);
+    }
+
+    function hasBookableRooms(place) {
+        return (place.rooms || []).some(room =>
+            room.type === 'bookable-room' ||
+            room.type === 'group-room' ||
+            !!room.bookingStatus
+        );
+    }
+
+    function hasAvailableBookableRooms(place) {
+        return (place.rooms || []).some(room =>
+            room.bookingStatus &&
+            room.bookingStatus.isBookable &&
+            !room.bookingStatus.isBookedNow
+        );
+    }
+
+    function placeMatchesCategory(place, category) {
+        if (category === 'all') return true;
+        if (category === 'restaurants') return isRestaurant(place);
+        if (category === 'buildings') return !isRestaurant(place);
+        if (category === 'availableBookable') return !isRestaurant(place) && hasAvailableBookableRooms(place);
+        if (category === 'bookable') return !isRestaurant(place) && hasBookableRooms(place);
+        if (category === 'microwaves') return !!place.microwaves;
+        if (category === 'printers') return !!place.printers;
+        return false;
+    }
+
+    function getCategoryPlaces(category) {
+        if (!category) return [];
+        if (category === 'all') return places;
+        return places.filter(place => placeMatchesCategory(place, category));
+    }
+
+    function getMicrowaveLocations(place) {
+        return ((place.microwaves && place.microwaves.locations) || [])
+            .filter(location =>
+                typeof location.lat === 'number' &&
+                typeof location.lng === 'number'
+            );
+    }
+
+    function getMicrowaveMarkerGroups(nextPlaces) {
+        const groups = new Map();
+
+        nextPlaces.forEach(place => {
+            getMicrowaveLocations(place).forEach(location => {
+                const key = `${location.lat.toFixed(6)}:${location.lng.toFixed(6)}`;
+                if (!groups.has(key)) {
+                    groups.set(key, {
+                        place,
+                        lat: location.lat,
+                        lng: location.lng,
+                        count: 0,
+                        locations: []
+                    });
+                }
+
+                groups.get(key).count += Number(location.count || 1);
+                groups.get(key).locations.push(location);
+            });
+        });
+
+        return [...groups.values()];
+    }
+
+    function getPrinterLocations(place) {
+        return ((place.printers && place.printers.locations) || [])
+            .filter(location =>
+                typeof location.lat === 'number' &&
+                typeof location.lng === 'number'
+            );
+    }
+
+    function getPrinterMarkerGroups(nextPlaces) {
+        const groups = new Map();
+
+        nextPlaces.forEach(place => {
+            getPrinterLocations(place).forEach(location => {
+                const key = `${location.lat.toFixed(6)}:${location.lng.toFixed(6)}`;
+                if (!groups.has(key)) {
+                    groups.set(key, {
+                        place,
+                        lat: location.lat,
+                        lng: location.lng,
+                        count: 0,
+                        locations: []
+                    });
+                }
+
+                groups.get(key).count += Number(location.count || 1);
+                groups.get(key).locations.push(location);
+            });
+        });
+
+        return [...groups.values()];
+    }
+
+    function getSearchResults() {
+        const q = input.value.trim();
+        if (!q) return [];
+
+        return places
+            .filter(place =>
+                searchTextMatches(getPlaceSearchText(place), q) ||
+                (place.rooms || []).some(room => roomMatchesQuery(room, normalizeSearchText(q)))
+            )
+            .sort((a, b) => {
+                const aD = getDistanceForPlace(a), bD = getDistanceForPlace(b);
+                if (aD == null && bD == null) return 0;
+                if (aD == null) return 1;
+                if (bD == null) return -1;
+                return aD - bD;
+            })
+            .slice(0, 12);
+    }
+
+    function updateCategoryButtons() {
+        categoryFilters.querySelectorAll('.category-chip').forEach(button => {
+            button.classList.toggle('active', button.dataset.category === activeCategory);
+        });
+        updatePopularPlaces();
+    }
+
+    function getPopularMode() {
+        const mode = activeNearbyCategory || activeCategory;
+        if (mode === 'restaurants') return 'restaurants';
+        if (mode === 'buildings') return 'buildings';
+        return null;
+    }
+
+    function getPopularPlaces(mode) {
+        const ids = mode === 'buildings' ? POPULAR_BUILDING_IDS : POPULAR_RESTAURANT_IDS;
+        return ids
+            .map(id => places.find(place => place.id === id))
+            .filter(Boolean)
+            .slice(0, 3);
+    }
+
+    function getPopularPlaceVisual(place) {
         if (isRestaurant(place)) {
-            const logo = restaurantLogos[place.id];
-            const links = restaurantLinks[place.id] || {};
-            return `
-                <div class="map-popup restaurant-popup">
-                    <h3>${escapeHtml(place.name)}</h3>
-                    ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
-                    ${place.openingHours ? `<p><strong>Open:</strong> ${escapeHtml(place.openingHours)}</p>` : ''}
-                    ${logo ? `<img src="${logo}" alt="${escapeHtml(place.name)}" style="max-width:90px;max-height:70px;object-fit:contain;margin:8px auto;display:block;">` : ''}
-                    ${links.menu ? `<a href="${escapeHtml(links.menu)}" target="_blank" rel="noreferrer">Open menu</a>` : ''}
-                    ${links.website ? `<a href="${escapeHtml(links.website)}" target="_blank" rel="noreferrer">Open website</a>` : ''}
-                </div>
-            `;
+            const category = getRestaurantCategory(place);
+            return {
+                label: category.label,
+                visual: category.logo
+                    ? `<img src="${escapeHtml(category.logo)}" alt="${escapeHtml(category.label)}">`
+                    : `<span aria-hidden="true">${category.icon}</span>`
+            };
         }
 
-        const rooms = (place.rooms || []).slice(0, 8);
-        const addresses = (place.addresses || []).slice(0, 3).join(', ');
-        const sections = (place.sections || []).slice(0, 5);
-        const roomRows = rooms.map(room => `
-            <li>
-                ${room.mapsUrl ? `<a href="${escapeHtml(room.mapsUrl)}" target="_blank" rel="noreferrer">${escapeHtml(room.name)}</a>` : escapeHtml(room.name)}
-                ${room.address ? `<span>${escapeHtml(room.address)}</span>` : ''}
-            </li>
-        `).join('');
-        const sectionRows = sections.map(section => `
-            <li class="popup-section-row">
-                <span class="popup-section-badge">${escapeHtml(section.logoText || section.shortName || 'SEC')}</span>
-                <div>
-                    <strong>${escapeHtml(section.name)}</strong>
-                    ${section.description ? `<span>${escapeHtml(section.description)}</span>` : ''}
-                </div>
-            </li>
-        `).join('');
-
-        return `
-            <div class="map-popup">
-                <h3>${escapeHtml(place.name)}</h3>
-                ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
-                <p>${place.roomCount || (place.rooms || []).length} rooms in backend data</p>
-                ${addresses ? `<p class="popup-address">${escapeHtml(addresses)}</p>` : ''}
-                ${place.sections ? `<p class="popup-feature"><span class="popup-feature-icon">🏠</span>${place.sections.length} section spaces</p>` : ''}
-                ${place.microwaves ? `<p class="popup-feature"><span class="popup-feature-icon">♨</span>${place.microwaves.count} microwaves</p>` : ''}
-                ${place.printers ? `<p class="popup-feature"><span class="popup-feature-icon">🖨</span>${place.printers.count} printers</p>` : ''}
-                ${sectionRows ? `<ul class="popup-sections-list">${sectionRows}</ul>` : ''}
-                ${roomRows ? `<ul>${roomRows}</ul>` : ''}
-                ${place.roomCount > (place.rooms || []).length ? `<small>Showing ${(place.rooms || []).length} of ${place.roomCount} rooms.</small>` : ''}
-            </div>
-        `;
+        if (place.id === 'building-25') return { label: 'Bibliotek & studieplats', visual: '<span aria-hidden="true">📚</span>' };
+        if (place.id === 'building-59') return { label: 'Kårhus & studentliv', visual: '<span aria-hidden="true">🏛️</span>' };
+        if (place.id === 'building-39') return { label: 'Byggnad', visual: '<span aria-hidden="true">🏫</span>' };
+        return { label: 'Byggnad', visual: '<span aria-hidden="true">🏢</span>' };
     }
 
-    function updateHighlightsPanel() {
-        if (!places.length) {
-            highlightsList.innerHTML = '<div class="highlight-item muted">No highlights loaded yet.</div>';
-            highlightsMeta.textContent = 'Loading...';
+    function updatePopularPlaces() {
+        if (!popularPlaces || !popularPlacesList) return;
+        const mode = getPopularMode();
+        const showPanel = !!mode && places.length > 0;
+        popularPlaces.hidden = !showPanel;
+        if (!showPanel) {
+            popularPlacesList.innerHTML = '';
             return;
         }
-        if (!userLocation) {
-            highlightsList.innerHTML = '<div class="highlight-item muted">Allow location access to see distances to all places.</div>';
-            highlightsMeta.textContent = `${places.length} places`;
-            return;
-        }
-        const sortedPlaces = [...places]
-            .map(place => ({ ...place, distanceInMeters: getDistanceForPlace(place) }))
-            .sort((a, b) => a.distanceInMeters - b.distanceInMeters);
 
-        highlightsMeta.textContent = `${sortedPlaces.length} places sorted by distance`;
-        highlightsList.innerHTML = sortedPlaces.map(place => `
-            <button class="highlight-item" type="button" data-place-id="${escapeHtml(place.id)}">
+        popularPlacesEyebrow.textContent = mode === 'buildings' ? 'Populära byggnader' : 'Populärt just nu';
+        popularPlacesTitle.textContent = mode === 'buildings'
+            ? 'Mest använda platser på campus'
+            : 'Studentfavoriter nära campus';
+
+        const popular = getPopularPlaces(mode);
+        popularPlacesList.innerHTML = popular.map((place, index) => {
+            const item = getPopularPlaceVisual(place);
+            return `
+                <button class="popular-restaurant-card" type="button" data-place-id="${escapeHtml(place.id)}">
+                    <span class="popular-rank">#${index + 1}</span>
+                    <span class="popular-icon">${item.visual}</span>
+                    <span class="popular-copy">
+                        <strong>${escapeHtml(place.name)}</strong>
+                        <em>${escapeHtml(item.label)}</em>
+                    </span>
+                </button>
+            `;
+        }).join('');
+
+        popularPlacesList.querySelectorAll('.popular-restaurant-card').forEach(card => {
+            card.addEventListener('click', () => {
+                const place = places.find(item => item.id === card.dataset.placeId);
+                if (place) selectPlace(place);
+            });
+        });
+    }
+
+    function updateCategoryScrollHint() {
+        const canScroll = categoryFilters.scrollWidth > categoryFilters.clientWidth + 8;
+        const reachedEnd = categoryFilters.scrollLeft + categoryFilters.clientWidth >= categoryFilters.scrollWidth - 8;
+
+        categoryFilters.classList.toggle('is-scrollable', canScroll);
+        categoryFilters.classList.toggle('is-at-end', reachedEnd);
+        categoryScrollHint.hidden = !canScroll || reachedEnd;
+    }
+
+    function updateNearbyScrollHint() {
+        const canScroll = nearbyFilters.scrollWidth > nearbyFilters.clientWidth + 8;
+        const reachedEnd = nearbyFilters.scrollLeft + nearbyFilters.clientWidth >= nearbyFilters.scrollWidth - 8;
+
+        nearbyFilters.classList.toggle('is-scrollable', canScroll);
+        nearbyFilters.classList.toggle('is-at-end', reachedEnd);
+        nearbyScrollHint.hidden = !nearbyPanelOpen || !canScroll || reachedEnd;
+    }
+
+    function getNearbyCategoryLabel(category) {
+        const labels = {
+            all: 'places',
+            availableBookable: 'available rooms',
+            bookable: 'bookable rooms',
+            restaurants: 'restaurants',
+            microwaves: 'microwaves',
+            printers: 'printers',
+            buildings: 'buildings'
+        };
+        return labels[category] || 'places';
+    }
+
+    function getNearbyPlaces(category) {
+        if (!category || !userLocation) return [];
+        return getCategoryPlaces(category)
+            .map(place => ({ ...place, distanceInMeters: getDistanceForPlace(place) }))
+            .filter(place => place.distanceInMeters != null)
+            .sort((a, b) => a.distanceInMeters - b.distanceInMeters)
+            .slice(0, NEARBY_RESULT_LIMIT);
+    }
+
+    function updateNearbyButtons() {
+        nearbyToggleButton.classList.toggle('active', nearbyPanelOpen);
+        nearbyToggleButton.setAttribute('aria-expanded', nearbyPanelOpen ? 'true' : 'false');
+        nearbyFilters.querySelectorAll('.nearby-chip').forEach(button => {
+            button.classList.toggle('active', button.dataset.nearbyCategory === activeNearbyCategory);
+        });
+        updatePopularPlaces();
+    }
+
+    function updateNearbyPanel() {
+        updateNearbyButtons();
+        updateNearbyScrollHint();
+        if (!nearbyPanelOpen) return;
+
+        if (!places.length) {
+            nearbyMeta.textContent = 'Loading...';
+            nearbyList.innerHTML = '<div class="nearby-item muted">Nearby data is loading.</div>';
+            return;
+        }
+
+        if (!activeNearbyCategory) {
+            nearbyMeta.textContent = 'Choose a filter';
+            nearbyList.innerHTML = '<div class="nearby-item muted">Choose what you want to find nearby.</div>';
+            return;
+        }
+
+        if (!userLocation) {
+            nearbyMeta.textContent = 'Location needed';
+            nearbyList.innerHTML = '<div class="nearby-item muted">Allow location access to sort nearby places.</div>';
+            return;
+        }
+
+        const nearbyPlaces = getNearbyPlaces(activeNearbyCategory);
+        const label = getNearbyCategoryLabel(activeNearbyCategory);
+        nearbyMeta.textContent = `${nearbyPlaces.length} nearest ${label}`;
+
+        if (!nearbyPlaces.length) {
+            nearbyList.innerHTML = `<div class="nearby-item muted">No ${escapeHtml(label)} found nearby.</div>`;
+            return;
+        }
+
+        nearbyList.innerHTML = nearbyPlaces.map(place => `
+            <button class="nearby-item" type="button" data-place-id="${escapeHtml(place.id)}">
                 <strong>${escapeHtml(place.name)}</strong>
                 <span>${formatDistance(place.distanceInMeters)}</span>
             </button>
         `).join('');
 
-        highlightsList.querySelectorAll('.highlight-item[data-place-id]').forEach(item => {
+        nearbyList.querySelectorAll('.nearby-item[data-place-id]').forEach(item => {
             item.addEventListener('click', () => {
                 const place = places.find(entry => entry.id === item.dataset.placeId);
                 if (place) selectPlace(place);
@@ -366,9 +1099,226 @@
         });
     }
 
+    function setNearbyPanelOpen(isOpen) {
+        nearbyPanelOpen = isOpen;
+        nearbyPanel.hidden = !nearbyPanelOpen;
+        updateNearbyPanel();
+    }
+
+    function hideNearbyPanel() {
+        setNearbyPanelOpen(false);
+    }
+
+    function setVisiblePlaces(nextPlaces, message) {
+        visiblePlaces = nextPlaces;
+        addPlacesToMap(visiblePlaces);
+        if (message) statusMessage.textContent = message;
+    }
+
+    function getMicrowavePopupHtml(group) {
+        const { place, locations } = group;
+        const distanceInMeters = getDistanceForPlace({
+            lat: group.lat,
+            lng: group.lng
+        });
+        const navigateButton = `<button class="popup-navigate-button" type="button" data-navigate-place-id="${escapeHtml(place.id)}">Navigate</button>`;
+        const microwaveRows = locations.map(location => `
+            <li>
+                ${location.mapsUrl ? `<a href="${escapeHtml(location.mapsUrl)}" target="_blank" rel="noreferrer">${escapeHtml(location.name || 'Microwave')}</a>` : escapeHtml(location.name || 'Microwave')}
+                ${location.address ? `<span>${escapeHtml(location.address)}</span>` : ''}
+            </li>
+        `).join('');
+
+        return `
+            <div class="map-popup">
+                <h3>Microwave</h3>
+                <p><strong>${escapeHtml(place.name)}</strong></p>
+                ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
+                ${navigateButton}
+                ${place.microwaves ? `<p class="popup-feature"><span class="popup-feature-icon">&#x2668;</span>${place.microwaves.count} microwaves in this building</p>` : ''}
+                ${microwaveRows ? `<ul>${microwaveRows}</ul>` : ''}
+            </div>
+        `;
+    }
+
+    function getPrinterPopupHtml(group) {
+        const { place, locations } = group;
+        const distanceInMeters = getDistanceForPlace({
+            lat: group.lat,
+            lng: group.lng
+        });
+        const navigateButton = `<button class="popup-navigate-button" type="button" data-navigate-place-id="${escapeHtml(place.id)}">Navigate</button>`;
+
+        return `
+            <div class="map-popup">
+                <h3>Printer</h3>
+                <p><strong>${escapeHtml(place.name)}</strong></p>
+                ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
+                ${navigateButton}
+                ${place.printers ? `<p class="popup-feature"><span class="popup-feature-icon">&#x1F5A8;</span>${place.printers.count} printers in this building</p>` : ''}
+            </div>
+        `;
+    }
+
+    function getPopupHtml(place) {
+        const distanceInMeters = getDistanceForPlace(place);
+        const navigateButton = `<button class="popup-navigate-button" type="button" data-navigate-place-id="${escapeHtml(place.id)}">Navigate</button>`;
+
+        if (isRestaurant(place)) {
+            const links = restaurantLinks[place.id] || {};
+            const category = getRestaurantCategory(place);
+            const categoryVisual = category.logo
+                ? `<img src="${escapeHtml(category.logo)}" alt="${escapeHtml(category.label)}">`
+                : category.icon;
+            const actionLinks = [
+                links.menu ? `<a class="restaurant-popup-link" href="${escapeHtml(links.menu)}" target="_blank" rel="noreferrer">Menu</a>` : '',
+                links.website ? `<a class="restaurant-popup-link" href="${escapeHtml(links.website)}" target="_blank" rel="noreferrer">Website</a>` : ''
+            ].filter(Boolean).join('');
+            return `
+                <div class="map-popup restaurant-popup">
+                    <div class="restaurant-popup-hero">
+                        <div class="restaurant-popup-icon" aria-hidden="true">${categoryVisual}</div>
+                        <div>
+                            <span class="restaurant-popup-category">${escapeHtml(category.label)}</span>
+                            <h3>${escapeHtml(place.name)}</h3>
+                        </div>
+                    </div>
+                    <div class="restaurant-popup-details">
+                        ${distanceInMeters != null ? `<p><span>Distance</span><strong>${formatDistance(distanceInMeters)}</strong></p>` : ''}
+                        ${place.address ? `<p><span>Address</span><strong>${escapeHtml(place.address)}</strong></p>` : ''}
+                        ${place.openingHours ? `<p><span>Open</span><strong>${escapeHtml(place.openingHours)}</strong></p>` : ''}
+                    </div>
+                    ${navigateButton}
+                    ${actionLinks ? `<div class="restaurant-popup-actions">${actionLinks}</div>` : ''}
+                </div>
+            `;
+        }
+
+        const rooms = place.rooms || [];
+        const addresses = (place.addresses || []).slice(0, 3).join(', ');
+        const sections = getRenderableSections(place).slice(0, 5);
+        const roomRows = rooms.map(room => {
+            const bookingStatus = formatBookingStatus(room.bookingStatus);
+            return `
+                <li>
+                    ${room.mapsUrl ? `<a href="${escapeHtml(room.mapsUrl)}" target="_blank" rel="noreferrer">${escapeHtml(room.name)}</a>` : escapeHtml(room.name)}
+                    ${room.address ? `<span>${escapeHtml(room.address)}</span>` : ''}
+                    ${bookingStatus ? `<span class="booking-status ${escapeHtml(bookingStatus.className)}">${escapeHtml(bookingStatus.text)}</span>` : ''}
+                </li>
+            `;
+        }).join('');
+        const sectionRows = sections.map(section => {
+            const sectionCode = escapeHtml(section.logoText || section.shortName || 'SEC').toUpperCase();
+            return `
+            <li class="popup-section-row">
+                <span class="popup-section-badge" data-section-code="${sectionCode}">${sectionCode}</span>
+                <div>
+                    <strong>${escapeHtml(section.name)}</strong>
+                    ${section.description ? `<span>${escapeHtml(section.description)}</span>` : ''}
+                </div>
+            </li>
+        `;
+        }).join('');
+
+        return `
+            <div class="map-popup">
+                <h3>${escapeHtml(place.name)}</h3>
+                ${distanceInMeters != null ? `<p><strong>Distance:</strong> ${formatDistance(distanceInMeters)}</p>` : ''}
+                <p>${place.roomCount || (place.rooms || []).length} rooms in backend data</p>
+                ${addresses ? `<p class="popup-address">${escapeHtml(addresses)}</p>` : ''}
+                ${navigateButton}
+                ${place.sections ? `<p class="popup-feature"><span class="popup-feature-icon">&#x1F3E0;</span>${place.sections.length} section spaces</p>` : ''}
+                ${place.microwaves ? `<p class="popup-feature"><span class="popup-feature-icon">&#x2668;</span>${place.microwaves.count} microwaves</p>` : ''}
+                ${place.printers ? `<p class="popup-feature"><span class="popup-feature-icon">&#x1F5A8;</span>${place.printers.count} printers</p>` : ''}
+                ${sectionRows ? `<ul class="popup-sections-list">${sectionRows}</ul>` : ''}
+                ${roomRows ? `<ul>${roomRows}</ul>` : ''}
+                ${rooms.length ? `<small>Showing all ${rooms.length} rooms.</small>` : ''}
+            </div>
+        `;
+    }
+
     function clearRoute() {
         activeDestinationId = null;
+        activeDestination = null;
         if (activeRoute) { activeRoute.remove(); activeRoute = null; }
+        if (paramDestinationMarker) {
+            paramDestinationMarker.remove();
+            paramDestinationMarker = null;
+        }
+        if (navigationWatchId != null && navigator.geolocation) {
+            navigator.geolocation.clearWatch(navigationWatchId);
+            navigationWatchId = null;
+        }
+        stopNavigationButton.hidden = true;
+    }
+
+    function stopNavigation(message = 'Navigation stopped.') {
+        clearRoute();
+        routeMessage.textContent = message;
+    }
+
+    function stopNavigationForContextChange(message = 'Navigation stopped because the map view changed.') {
+        if (!activeDestinationId && !activeRoute) return;
+        stopNavigation(message);
+    }
+
+    function startNavigationWatch(place) {
+        if (!navigator.geolocation) return;
+        if (navigationWatchId != null) {
+            navigator.geolocation.clearWatch(navigationWatchId);
+        }
+
+        navigationWatchId = navigator.geolocation.watchPosition(
+            pos => {
+                const nextLocation = {
+                    latitude: pos.coords.latitude,
+                    longitude: pos.coords.longitude,
+                    accuracy: pos.coords.accuracy
+                };
+                setUserLocationOnMap(nextLocation);
+
+                const distanceToDestination = calculateDistanceInMeters(
+                    nextLocation.latitude,
+                    nextLocation.longitude,
+                    place.lat,
+                    place.lng
+                );
+
+                if (distanceToDestination <= 30) {
+                    stopNavigation(`You have arrived at ${place.name}.`);
+                }
+            },
+            () => {},
+            {
+                enableHighAccuracy: true,
+                timeout: 12000,
+                maximumAge: 5000
+            }
+        );
+    }
+
+    function setUserLocationOnMap(location, label = 'You are here') {
+        userLocation = location;
+        if (userMarker) userMarker.remove();
+        if (userAccuracyCircle) userAccuracyCircle.remove();
+        userMarker = L.marker([userLocation.latitude, userLocation.longitude], {
+            icon: L.divIcon({
+                className: '',
+                html: '<div class="user-location-marker"></div>',
+                iconSize: [20, 20],
+                iconAnchor: [10, 10]
+            })
+        }).addTo(map).bindPopup(label);
+
+        if (userLocation.accuracy) {
+            userAccuracyCircle = L.circle([userLocation.latitude, userLocation.longitude], {
+                radius: userLocation.accuracy,
+                color: '#2f80ed', weight: 1,
+                fillColor: '#2f80ed', fillOpacity: 0.12
+            }).addTo(map);
+        } else {
+            userAccuracyCircle = null;
+        }
     }
 
     function drawRouteLine(latLngs, options = {}) {
@@ -379,7 +1329,7 @@
             opacity: options.opacity || 0.9,
             lineCap: 'round',
             lineJoin: 'round',
-            dashArray: options.dashArray || '10 8'
+            dashArray: Object.prototype.hasOwnProperty.call(options, 'dashArray') ? options.dashArray : '10 8'
         }).addTo(map);
         map.fitBounds(L.latLngBounds(latLngs), { padding: [60, 60], maxZoom: 18 });
     }
@@ -467,62 +1417,146 @@
         return { latLngs, distance: totalDistance, startOffset: startNode.distance, endOffset: endNode.distance, startNodeId: startNode.nodeId, endNodeId: endNode.nodeId };
     }
 
+    async function fetchOpenRouteServiceWalkingRoute(startPoint, endPoint) {
+        const response = await fetch(DIRECTIONS_API_URL, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                coordinates: [
+                    [startPoint[1], startPoint[0]],
+                    [endPoint[1], endPoint[0]]
+                ],
+                instructions: true,
+                units: 'm'
+            })
+        });
+
+        if (!response.ok) {
+            const message = await response.text();
+            throw new Error(message || 'Could not calculate a walking route.');
+        }
+
+        return response.json();
+    }
+
+    function getOpenRouteServiceLatLngs(route) {
+        return ((route.features && route.features[0] && route.features[0].geometry.coordinates) || [])
+            .map(([lng, lat]) => [lat, lng]);
+    }
+
+    function getOpenRouteServiceSummary(route) {
+        return route.features && route.features[0] && route.features[0].properties.summary;
+    }
+
+    function getRouteErrorMessage(error) {
+        const fallback = error && error.message ? error.message : 'Route could not be calculated.';
+        try {
+            const parsed = JSON.parse(fallback);
+            if (parsed.details && typeof parsed.details === 'object') {
+                return parsed.details.error || parsed.details.message || parsed.error || fallback;
+            }
+            return parsed.details || parsed.error || fallback;
+        } catch {
+            return fallback;
+        }
+    }
+
     async function drawWalkingRoute(place) {
         if (!userLocation) {
-            routeMessage.textContent = 'Click My location first to calculate a walking trail.';
+            routeMessage.textContent = 'Click Nearby first to calculate walking navigation.';
             clearRoute();
             return;
         }
-        routeMessage.textContent = `Calculating walking trail to ${place.name}...`;
+        routeMessage.textContent = `Calculating walking navigation to ${place.name}...`;
         activeDestinationId = place.id;
+        activeDestination = place;
         try {
             const startPoint = [userLocation.latitude, userLocation.longitude];
             const endPoint = [place.lat, place.lng];
-            const route = findShortestCampusPath(startPoint, endPoint);
-            if (!route) throw new Error('No campus path was found.');
+            const route = await fetchOpenRouteServiceWalkingRoute(startPoint, endPoint);
             if (activeDestinationId !== place.id) return;
+            const routeLatLngs = getOpenRouteServiceLatLngs(route);
+            if (routeLatLngs.length < 2) throw new Error('No walking route was found.');
             clearRoute();
             activeDestinationId = place.id;
-            drawRouteLine(route.latLngs, { color: '#16a34a', weight: 6, opacity: 0.9, dashArray: '10 8' });
-            const estimatedDurationSeconds = route.distance / 1.35;
-            const offsetNote = route.endOffset > 18 ? ` | nearest walkway ${formatDistance(route.endOffset)} away` : '';
-            routeMessage.textContent = `${place.name}: ${formatDistance(route.distance)} | ${formatWalkingTime(estimatedDurationSeconds)} | campus trail${offsetNote}`;
+            activeDestination = place;
+            drawRouteLine(routeLatLngs, { color: '#16a34a', weight: 6, opacity: 0.9, dashArray: null });
+            const summary = getOpenRouteServiceSummary(route);
+            routeMessage.textContent = summary
+                ? `${place.name}: ${formatDistance(summary.distance)} | ${formatWalkingTime(summary.duration)}`
+                : `${place.name}: Navigation started`;
+            stopNavigationButton.hidden = false;
+            startNavigationWatch(place);
         } catch (error) {
             clearRoute();
-            routeMessage.textContent = `Could not find a campus trail to ${place.name}.`;
+            routeMessage.textContent = `Could not calculate navigation to ${place.name}: ${getRouteErrorMessage(error)}`;
             console.error(error);
         }
     }
 
-    function addPlacesToMap() {
+    function addPlacesToMap(nextPlaces = visiblePlaces) {
         buildingMarkers.forEach(m => m.remove());
-        microwaveMarkers.forEach(m => m.remove());
         sectionMarkers.forEach(m => m.remove());
-        buildingMarkers = []; microwaveMarkers = []; sectionMarkers = [];
+        buildingMarkers = []; sectionMarkers = [];
 
-        places.forEach(place => {
-            const markerIcon = isRestaurant(place) ? getRestaurantIcon(place) : buildingIcon;
-            const marker = L.marker([place.lat, place.lng], { icon: markerIcon })
+        const mapMode = activeNearbyCategory || activeCategory;
+
+        function renderMicrowaveMarkers() {
+            getMicrowaveMarkerGroups(nextPlaces).forEach(group => {
+                const marker = L.marker([group.lat, group.lng], {
+                    icon: getMicrowaveIcon(group.count),
+                    placeId: group.place.id
+                })
+                    .addTo(map)
+                    .bindPopup(getMicrowavePopupHtml(group), popupOptions);
+                marker.on('click', () => selectPlace(group.place));
+                buildingMarkers.push(marker);
+            });
+        }
+
+        function renderPrinterMarkers() {
+            getPrinterMarkerGroups(nextPlaces).forEach(group => {
+                const marker = L.marker([group.lat, group.lng], {
+                    icon: getPrinterIcon(group.count),
+                    placeId: group.place.id
+                })
+                    .addTo(map)
+                    .bindPopup(getPrinterPopupHtml(group), popupOptions);
+                marker.on('click', () => selectPlace(group.place));
+                buildingMarkers.push(marker);
+            });
+        }
+
+        if (mapMode === 'microwaves') {
+            renderMicrowaveMarkers();
+            return;
+        }
+
+        if (mapMode === 'printers') {
+            renderPrinterMarkers();
+            return;
+        }
+
+        nextPlaces.forEach(place => {
+            const markerIcon = isRestaurant(place)
+                ? getRestaurantIcon(place)
+                : isTHSPlace(place)
+                    ? getTHSBuildingIcon()
+                    : buildingIcon;
+            const marker = L.marker([place.lat, place.lng], {
+                icon: markerIcon,
+                placeId: place.id
+            })
                 .addTo(map)
-                .bindPopup(getPopupHtml(place));
+                .bindPopup(getPopupHtml(place), popupOptions);
             marker.on('click', () => selectPlace(place));
             buildingMarkers.push(marker);
 
-            if (!isRestaurant(place) && place.microwaves) {
-                const microwaveMarker = L.marker([place.lat + 0.00012, place.lng + 0.00012], { icon: microwaveIcon })
-                    .addTo(map)
-                    .bindPopup(`
-                        <div class="map-popup">
-                            <h3>${escapeHtml(place.name)} - microwaves</h3>
-                            <p>Count: ${place.microwaves.count}</p>
-                            ${getDistanceForPlace(place) != null ? `<p><strong>Distance:</strong> ${formatDistance(getDistanceForPlace(place))}</p>` : ''}
-                        </div>
-                    `);
-                microwaveMarkers.push(microwaveMarker);
-            }
-
-            if (!isRestaurant(place) && place.sections) {
-                place.sections.forEach((section, index) => {
+            const renderableSections = getRenderableSections(place);
+            if (renderableSections.length) {
+                renderableSections.forEach((section, index) => {
                     const latOffset = 0.00008 + (index * 0.00003);
                     const lngOffset = -0.00008 + (index * 0.00003);
                     const sectionMarker = L.marker(
@@ -535,24 +1569,44 @@
                                 <h3>${escapeHtml(section.name)}</h3>
                                 <p>${escapeHtml(section.buildingName || place.name)}</p>
                                 ${section.description ? `<p>${escapeHtml(section.description)}</p>` : ''}
+                                <button class="popup-navigate-button" type="button" data-navigate-place-id="${escapeHtml(place.id)}">Navigate</button>
                                 ${section.mapsUrl ? `<a href="${escapeHtml(section.mapsUrl)}" target="_blank" rel="noreferrer">Open in Maps</a>` : ''}
                             </div>
-                        `);
+                        `, popupOptions);
                     sectionMarker.on('click', () => selectPlace(place));
                     sectionMarkers.push(sectionMarker);
                 });
             }
         });
+
+        if (mapMode === 'all') {
+            renderMicrowaveMarkers();
+            renderPrinterMarkers();
+        }
+    }
+
+    async function fetchRoomSchedule() {
+        try {
+            const response = await fetch(ROOM_SCHEDULE_API_URL);
+            if (!response.ok) throw new Error('The room schedule API did not respond correctly.');
+            return await response.json();
+        } catch (error) {
+            console.error('Could not load room schedule', error);
+            return null;
+        }
     }
 
     async function loadPlaces() {
         try {
-            const response = await fetch(API_URL);
-            if (!response.ok) throw new Error('The API did not respond correctly.');
-            places = await response.json();
-            addPlacesToMap();
-            updateHighlightsPanel();
-            statusMessage.textContent = `${places.length} places loaded`;
+            const [placesResponse, scheduleData] = await Promise.all([
+                fetch(API_URL),
+                fetchRoomSchedule()
+            ]);
+            if (!placesResponse.ok) throw new Error('The API did not respond correctly.');
+            const basePlaces = await placesResponse.json();
+            places = mergePlacesWithSchedule(basePlaces, scheduleData && scheduleData.buildings ? scheduleData.buildings : []);
+            setVisiblePlaces([], `${places.length} places loaded${scheduleData ? ' - live room booking active' : ''} - search or choose a category`);
+            updateNearbyPanel();
         } catch (error) {
             statusMessage.textContent = 'Could not load data. Start the backend with: python backend/api.py';
             console.error(error);
@@ -560,36 +1614,135 @@
     }
 
     function selectPlace(place) {
+        if (!visiblePlaces.some(item => item.id === place.id)) {
+            activeCategory = null;
+            updateCategoryButtons();
+            setVisiblePlaces([place], `Showing ${place.name}`);
+        }
+
         map.flyTo([place.lat, place.lng], 17, { duration: 0.8 });
         const marker = buildingMarkers.find(item => {
             const pos = item.getLatLng();
             return pos.lat === place.lat && pos.lng === place.lng;
-        });
+        }) || buildingMarkers.find(item => item.options.placeId === place.id);
         if (marker) marker.openPopup();
-        drawWalkingRoute(place);
+        routeMessage.textContent = 'Press Navigate in the popup to start walking navigation.';
+    }
+
+    async function navigateToPlace(place) {
+        if (!place) return;
+        if (!userLocation) {
+            const located = await showUserLocation();
+            if (!located) {
+                routeMessage.textContent = 'Location is required to start navigation. Open the site on localhost or HTTPS and allow location access in the browser.';
+                return;
+            }
+        }
+        if (userLocation) {
+            await drawWalkingRoute(place);
+        }
     }
 
     function openPlaceFromParams() {
         const placeId = pageParams.get('place');
-        if (!placeId) return;
+        if (!placeId) return null;
         const place = places.find(item => item.id === placeId);
-        if (place) selectPlace(place);
+        if (place) {
+            selectPlace(place);
+            return place;
+        }
+        return null;
+    }
+
+    function getNavigationDestinationFromParams(selectedPlace) {
+        if (pageParams.get('autoNavigate') !== '1') return null;
+
+        const roomName = pageParams.get('room');
+        const lat = Number(pageParams.get('lat'));
+        const lng = Number(pageParams.get('lng'));
+
+        if (selectedPlace) {
+            return {
+                ...selectedPlace,
+                name: roomName || selectedPlace.name,
+                lat: Number.isFinite(lat) ? lat : selectedPlace.lat,
+                lng: Number.isFinite(lng) ? lng : selectedPlace.lng
+            };
+        }
+
+        if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+        return {
+            id: `external-destination-${roomName || 'room'}`,
+            name: roomName || 'Destination',
+            lat,
+            lng,
+            rooms: [],
+            roomCount: 0
+        };
+    }
+
+    function renderTemporaryDestinationMarker(place) {
+        if (!place) return;
+        if (paramDestinationMarker) {
+            paramDestinationMarker.remove();
+        }
+
+        paramDestinationMarker = L.marker([place.lat, place.lng], {
+            icon: buildingIcon
+        }).addTo(map).bindPopup(`
+            <div class="map-popup">
+                <h3>${escapeHtml(place.name)}</h3>
+                <p>Navigation destination</p>
+            </div>
+        `, popupOptions);
+        paramDestinationMarker.openPopup();
+    }
+
+    async function autoNavigateFromParams(selectedPlace) {
+        const destination = getNavigationDestinationFromParams(selectedPlace);
+        if (!destination) return;
+
+        if (!selectedPlace) {
+            renderTemporaryDestinationMarker(destination);
+            map.flyTo([destination.lat, destination.lng], 17, { duration: 0.8 });
+        }
+
+        routeMessage.textContent = `Preparing navigation to ${destination.name}...`;
+        statusMessage.textContent = 'Fetching your location for navigation...';
+        const located = await showUserLocation();
+        if (!located) {
+            routeMessage.textContent = `Location is required to navigate to ${destination.name}. Allow location access and try again.`;
+            return;
+        }
+        await drawWalkingRoute(destination);
     }
 
     function search() {
         const q = normalizeSearchText(input.value.trim());
-        if (!q) { dropdown.classList.remove('show'); return; }
+        if (!q) {
+            dropdown.classList.remove('show');
+            categoryFilters.parentElement.hidden = false;
+            const categoryPlaces = getCategoryPlaces(activeCategory);
+            setVisiblePlaces(
+                categoryPlaces,
+                activeCategory
+                    ? `${categoryPlaces.length} places shown`
+                    : `${places.length} places loaded - search or choose a category`
+            );
+            return;
+        }
+
+        stopNavigationForContextChange('Navigation stopped because you started a new search.');
+        hideNearbyPanel();
         box.classList.add('active');
-        const filtered = places
-            .filter(place => getPlaceSearchText(place).includes(q))
-            .sort((a, b) => {
-                const aD = getDistanceForPlace(a), bD = getDistanceForPlace(b);
-                if (aD == null && bD == null) return 0;
-                if (aD == null) return 1;
-                if (bD == null) return -1;
-                return aD - bD;
-            })
-            .slice(0, 12);
+        categoryFilters.parentElement.hidden = true;
+        activeCategory = null;
+        activeNearbyCategory = null;
+        updateCategoryButtons();
+        updateNearbyPanel();
+        const filtered = getSearchResults();
+        setVisiblePlaces(filtered, `${filtered.length} search results shown on map`);
         showResults(filtered);
     }
 
@@ -597,7 +1750,7 @@
         const q = normalizeSearchText(input.value.trim());
         if (!q) return [];
         return (place.rooms || [])
-            .filter(room => normalizeSearchText([room.name, room.address, room.buildingName].join(' ')).includes(q))
+            .filter(room => roomMatchesQuery(room, q))
             .slice(0, 5);
     }
 
@@ -609,7 +1762,11 @@
         }
         dropdown.innerHTML = items.map(place => {
             const matchingRooms = getMatchingRooms(place);
-            const roomNames = matchingRooms.map(room => escapeHtml(room.name)).join(', ');
+            const roomNames = matchingRooms.map(room => {
+                const bookingStatus = formatBookingStatus(room.bookingStatus);
+                if (!bookingStatus) return escapeHtml(room.name);
+                return `${escapeHtml(room.name)} - ${escapeHtml(bookingStatus.text)}`;
+            }).join(', ');
             const distanceInMeters = getDistanceForPlace(place);
             const metaText = roomNames || `${place.roomCount || (place.rooms || []).length} rooms`;
             return `
@@ -629,60 +1786,212 @@
     }
 
     function clearSearch() {
+        stopNavigationForContextChange('Navigation stopped because the search was cleared.');
         input.value = '';
         box.classList.remove('active');
         dropdown.classList.remove('show');
         dropdown.innerHTML = '';
+        categoryFilters.parentElement.hidden = false;
+        activeNearbyCategory = null;
+        hideNearbyPanel();
+        updateNearbyPanel();
+        const categoryPlaces = getCategoryPlaces(activeCategory);
+        setVisiblePlaces(
+            categoryPlaces,
+            activeCategory
+                ? `${categoryPlaces.length} places shown`
+                : `${places.length} places loaded - search or choose a category`
+        );
         input.focus();
     }
 
     async function showUserLocation() {
-        locateButton.disabled = true;
-        locateButton.textContent = 'Locating...';
+        nearbyToggleButton.disabled = true;
+        nearbyToggleButton.textContent = 'Locating...';
         statusMessage.textContent = 'Fetching your location...';
         try {
-            userLocation = await requestUserLocation();
-            if (userMarker) userMarker.remove();
-            if (userAccuracyCircle) userAccuracyCircle.remove();
-            userMarker = L.marker([userLocation.latitude, userLocation.longitude], {
-                icon: L.divIcon({
-                    className: '',
-                    html: '<div class="user-location-marker"></div>',
-                    iconSize: [20, 20],
-                    iconAnchor: [10, 10]
-                })
-            }).addTo(map).bindPopup('You are here');
-            userAccuracyCircle = L.circle([userLocation.latitude, userLocation.longitude], {
-                radius: userLocation.accuracy || 25,
-                color: '#2f80ed', weight: 1,
-                fillColor: '#2f80ed', fillOpacity: 0.12
-            }).addTo(map);
+            const nextLocation = await requestUserLocation();
+            setUserLocationOnMap(nextLocation);
             map.flyTo([userLocation.latitude, userLocation.longitude], 17, { duration: 0.8 });
-            addPlacesToMap();
-            updateHighlightsPanel();
+            let locationStatus = `Showing distances from your location. Accuracy ${Math.round(userLocation.accuracy || 0)} m.`;
+            if (activeNearbyCategory) {
+                const nearbyPlaces = getNearbyPlaces(activeNearbyCategory);
+                const label = getNearbyCategoryLabel(activeNearbyCategory);
+                setVisiblePlaces(nearbyPlaces, `${nearbyPlaces.length} nearest ${label} shown`);
+                locationStatus = `${nearbyPlaces.length} nearest ${label} shown from your location.`;
+            } else {
+                addPlacesToMap();
+            }
+            updateNearbyPanel();
             clearRoute();
-            routeMessage.textContent = 'Select a building to see a walking trail.';
-            statusMessage.textContent = `Showing distances from your location. Accuracy ${Math.round(userLocation.accuracy || 0)} m.`;
+            routeMessage.textContent = 'Select a place and press Navigate.';
+            statusMessage.textContent = locationStatus;
+            return true;
         } catch (error) {
             statusMessage.textContent = error.message;
+            routeMessage.textContent = 'Location is required for nearby results and navigation. Allow location access or open the site through localhost or HTTPS.';
+            return false;
         } finally {
-            locateButton.disabled = false;
-            locateButton.textContent = 'My location';
+            nearbyToggleButton.disabled = false;
+            nearbyToggleButton.textContent = 'Nearby';
         }
     }
 
     searchButton.addEventListener('click', search);
     clearSearchButton.addEventListener('click', clearSearch);
-    locateButton.addEventListener('click', showUserLocation);
-    input.addEventListener('keydown', event => { if (event.key === 'Enter') search(); });
+    stopNavigationButton.addEventListener('click', () => {
+        stopNavigation('Navigation stopped.');
+    });
+    nearbyToggleButton.addEventListener('click', async () => {
+        if (nearbyPanelOpen) {
+            hideNearbyPanel();
+            return;
+        }
+
+        stopNavigationForContextChange('Navigation stopped because you opened nearby.');
+        input.value = '';
+        box.classList.remove('active');
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        categoryFilters.parentElement.hidden = false;
+        activeCategory = null;
+        activeNearbyCategory = 'all';
+        updateCategoryButtons();
+        setNearbyPanelOpen(true);
+
+        const located = await showUserLocation();
+        if (!located) {
+            updateNearbyPanel();
+            return;
+        }
+
+        const nearbyPlaces = getNearbyPlaces(activeNearbyCategory);
+        setVisiblePlaces(nearbyPlaces, `${nearbyPlaces.length} nearest places shown`);
+        updateNearbyPanel();
+    });
+    nearbyFilters.addEventListener('click', async event => {
+        const button = event.target.closest('.nearby-chip');
+        if (!button) return;
+
+        stopNavigationForContextChange('Navigation stopped because you changed nearby filters.');
+        const nextNearbyCategory = activeNearbyCategory === button.dataset.nearbyCategory
+            ? null
+            : button.dataset.nearbyCategory;
+        activeNearbyCategory = nextNearbyCategory;
+        activeCategory = null;
+        input.value = '';
+        box.classList.remove('active');
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        updateCategoryButtons();
+        updateNearbyPanel();
+
+        if (!activeNearbyCategory) {
+            setVisiblePlaces([], `${places.length} places loaded - search or choose a category`);
+            return;
+        }
+
+        if (!userLocation) {
+            const located = await showUserLocation();
+            if (!located) {
+                updateNearbyPanel();
+                return;
+            }
+        }
+
+        const nearbyPlaces = getNearbyPlaces(activeNearbyCategory);
+        const label = getNearbyCategoryLabel(activeNearbyCategory);
+        setVisiblePlaces(nearbyPlaces, `${nearbyPlaces.length} nearest ${label} shown`);
+        updateNearbyPanel();
+    });
+    categoryFilters.addEventListener('click', event => {
+        const button = event.target.closest('.category-chip');
+        if (!button) return;
+
+        stopNavigationForContextChange('Navigation stopped because you changed map filters.');
+        const nextCategory = activeCategory === button.dataset.category ? null : button.dataset.category;
+        activeCategory = nextCategory;
+        activeNearbyCategory = null;
+        input.value = '';
+        box.classList.remove('active');
+        dropdown.classList.remove('show');
+        dropdown.innerHTML = '';
+        updateCategoryButtons();
+        updateNearbyPanel();
+
+        const categoryPlaces = getCategoryPlaces(activeCategory);
+        setVisiblePlaces(
+            categoryPlaces,
+            activeCategory
+                ? `${categoryPlaces.length} places shown`
+                : `${places.length} places loaded - search or choose a category`
+        );
+    });
+    document.addEventListener('click', event => {
+        const navigateButton = event.target.closest('.popup-navigate-button');
+        if (!navigateButton) return;
+        const place = places.find(item => item.id === navigateButton.dataset.navigatePlaceId);
+        navigateToPlace(place);
+    });
+    input.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            search();
+        }
+    });
     input.addEventListener('input', () => {
         if (input.value.trim()) { box.classList.add('active'); search(); }
-        else { box.classList.remove('active'); dropdown.classList.remove('show'); }
+        else {
+            stopNavigationForContextChange('Navigation stopped because the search changed.');
+            box.classList.remove('active');
+            dropdown.classList.remove('show');
+            categoryFilters.parentElement.hidden = false;
+            activeNearbyCategory = null;
+        hideNearbyPanel();
+        updateNearbyPanel();
+            const categoryPlaces = getCategoryPlaces(activeCategory);
+            setVisiblePlaces(
+                categoryPlaces,
+                activeCategory
+                    ? `${categoryPlaces.length} places shown`
+                    : `${places.length} places loaded - search or choose a category`
+            );
+        }
     });
 
-    loadPlaces().then(() => {
+    loadPlaces().then(async () => {
         if (pageParams.get('q')) { input.value = pageParams.get('q'); search(); }
-        openPlaceFromParams();
+        const selectedPlace = openPlaceFromParams();
+        await autoNavigateFromParams(selectedPlace);
+        updateCategoryScrollHint();
+
+        // Auto-activate a category from URL param (e.g. ?category=buildings)
+        const paramCategory = pageParams.get('category');
+        if (!pageParams.get('q') && !selectedPlace) {
+            activeCategory = paramCategory || 'buildings';
+            updateCategoryButtons();
+            const categoryPlaces = getCategoryPlaces(activeCategory);
+            setVisiblePlaces(categoryPlaces, `${categoryPlaces.length} places shown`);
+        }
+    });
+
+    categoryFilters.addEventListener('scroll', updateCategoryScrollHint, { passive: true });
+    nearbyFilters.addEventListener('scroll', updateNearbyScrollHint, { passive: true });
+    categoryScrollButton.addEventListener('click', () => {
+        categoryFilters.scrollBy({
+            left: Math.max(180, Math.round(categoryFilters.clientWidth * 0.7)),
+            behavior: 'smooth'
+        });
+    });
+    nearbyScrollButton.addEventListener('click', () => {
+        nearbyFilters.scrollBy({
+            left: Math.max(180, Math.round(nearbyFilters.clientWidth * 0.7)),
+            behavior: 'smooth'
+        });
+    });
+    window.addEventListener('resize', () => {
+        updateCategoryScrollHint();
+        updateNearbyScrollHint();
     });
 </script>
 </body>

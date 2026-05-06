@@ -1,8 +1,9 @@
 <!DOCTYPE html>
-<html lang="sv">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Boka grupprum – CampusFinder</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Study Room - CampusFinder</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap">
     <link rel="stylesheet" href="../css/home.css">
@@ -20,26 +21,672 @@
         <a href="home.html">Home</a>
         <a href="karta.html">Map</a>
         <a href="restaurang.html">Restaurants</a>
-        <a href="about.html" >About</a>
+        <a href="about.html">About</a>
         <a href="grupprum.html" class="cta active">Book a Study Room</a>
     </nav>
 </header>
 
-<main class="coming-soon">
-    <div class="coming-soon-icon">
-        <svg viewBox="0 0 24 24" fill="none" stroke="#4f6ef7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <rect x="3" y="4" width="18" height="18" rx="2"/>
-            <path d="M16 2v4M8 2v4M3 10h18"/>
-            <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01"/>
-        </svg>
-    </div>
-    <h1>Comming soon......</h1>
-    <a href="home.html">← Back to Main page</a>
+<main class="rooms-page">
+    <section class="rooms-hero">
+        <div>
+            <p class="rooms-eyebrow">Live via TimeEdit</p>
+            <h1>Bookable study rooms at KTH</h1>
+            <p class="rooms-subtitle">See which rooms are available right now, filter by campus and room type, and open the official TimeEdit link for booking.</p>
+        </div>
+        <div class="rooms-summary" aria-live="polite">
+            <strong id="visibleCount">-</strong>
+            <span id="summaryLabel">Loading rooms...</span>
+        </div>
+    </section>
+
+    <section class="rooms-toolbar" aria-label="Room filters">
+        <div class="filter-tabs" role="group" aria-label="Availability filter">
+            <button class="filter-tab active" type="button" data-filter="free">Available now</button>
+            <button class="filter-tab" type="button" data-filter="all">All rooms</button>
+        </div>
+
+        <label class="filter-field">
+            <span>Campus</span>
+            <div class="custom-select" id="campusSelect">
+                <select id="campusFilter" class="filter-select-hidden">
+                    <option value="all">Choose</option>
+                </select>
+                <button class="select-shell" id="campusSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="select-value" id="campusSelectValue">Choose</span>
+                    <span class="select-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="select-menu" id="campusSelectMenu" role="listbox" hidden></div>
+            </div>
+        </label>
+
+        <label class="filter-field">
+            <span>Room type</span>
+            <div class="custom-select" id="roomTypeSelect">
+                <select id="roomTypeFilter" class="filter-select-hidden">
+                    <option value="all">Choose</option>
+                    <option value="study-room">Study room</option>
+                    <option value="classroom">Classroom</option>
+                </select>
+                <button class="select-shell" id="roomTypeSelectButton" type="button" aria-haspopup="listbox" aria-expanded="false">
+                    <span class="select-value" id="roomTypeSelectValue">Choose</span>
+                    <span class="select-chevron" aria-hidden="true"></span>
+                </button>
+                <div class="select-menu" id="roomTypeSelectMenu" role="listbox" hidden></div>
+            </div>
+        </label>
+
+        <label class="room-search">
+            <span>Search</span>
+            <div class="room-search-box" id="roomSearchBox">
+                <input id="roomSearch" type="text" placeholder="Room, campus, or room number..." autocomplete="off">
+                <button class="room-search-clear" id="roomSearchClear" type="button" aria-label="Clear search"><span aria-hidden="true">&times;</span></button>
+                <button class="room-search-button" id="roomSearchButton" type="button" aria-label="Search rooms">
+                    <span class="room-search-button-icon" aria-hidden="true"></span>
+                </button>
+                <div id="roomSearchResults" class="room-search-results"></div>
+            </div>
+        </label>
+    </section>
+
+    <section class="rooms-status" id="statusMessage">Loading TimeEdit rooms...</section>
+    <section class="rooms-grid" id="roomsGrid" aria-live="polite"></section>
 </main>
 
 <footer>
-    <p>© 2026 KTH CampusFinder</p>
+    <p>&copy; 2026 KTH CampusFinder</p>
 </footer>
+
+<script>
+    const backendProtocol = window.location.protocol === 'https:' ? 'https:' : 'http:';
+    const backendHost = window.location.hostname || '127.0.0.1';
+    const API_BASE_URL = window.location.port === '5173'
+        ? '/api'
+        : `${backendProtocol}//${backendHost}:5001/api`;
+    const ROOMS_API_URL = `${API_BASE_URL}/rooms`;
+    const PLACES_DATA_VERSION = '2026-05-05';
+    const PLACES_API_URL = `../data/places.json?v=${PLACES_DATA_VERSION}`;
+
+    const roomsGrid = document.getElementById('roomsGrid');
+    const statusMessage = document.getElementById('statusMessage');
+    const visibleCount = document.getElementById('visibleCount');
+    const summaryLabel = document.getElementById('summaryLabel');
+    const roomSearch = document.getElementById('roomSearch');
+    const roomSearchBox = document.getElementById('roomSearchBox');
+    const roomSearchClear = document.getElementById('roomSearchClear');
+    const roomSearchButton = document.getElementById('roomSearchButton');
+    const roomSearchResults = document.getElementById('roomSearchResults');
+    const campusFilter = document.getElementById('campusFilter');
+    const roomTypeFilter = document.getElementById('roomTypeFilter');
+    const campusSelect = document.getElementById('campusSelect');
+    const campusSelectButton = document.getElementById('campusSelectButton');
+    const campusSelectValue = document.getElementById('campusSelectValue');
+    const campusSelectMenu = document.getElementById('campusSelectMenu');
+    const roomTypeSelect = document.getElementById('roomTypeSelect');
+    const roomTypeSelectButton = document.getElementById('roomTypeSelectButton');
+    const roomTypeSelectValue = document.getElementById('roomTypeSelectValue');
+    const roomTypeSelectMenu = document.getElementById('roomTypeSelectMenu');
+    const filterTabs = [...document.querySelectorAll('.filter-tab')];
+
+    let allRooms = [];
+    let activeFilter = 'free';
+    let refreshTimer = null;
+    let roomNavigationIndexPromise = null;
+    const studyRoomNames = new Set([
+        'v-grupprum 1',
+        'v-grupprum 2',
+        'v-grupprum 3',
+        'v-grupprum 4',
+        'v-grupprum 5',
+        'v-grupprum 6',
+        'v-grupprum 7',
+        'v-grupprum 8',
+        'v-grupprum 9',
+        'v-grupprum 10',
+        'v-grupprum 11'
+    ]);
+
+    function normalizeText(value) {
+        return String(value || '')
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '')
+            .toLowerCase()
+            .trim();
+    }
+
+    function escapeHtml(value) {
+        return String(value || '')
+            .replaceAll('&', '&amp;')
+            .replaceAll('<', '&lt;')
+            .replaceAll('>', '&gt;')
+            .replaceAll('"', '&quot;')
+            .replaceAll("'", '&#039;');
+    }
+
+    function formatClock(value) {
+        if (!value) return '';
+        return value.slice(0, 5);
+    }
+
+    function getRoomCategory(room) {
+        const normalizedName = normalizeText(room.name);
+        return studyRoomNames.has(normalizedName) ? 'study-room' : 'classroom';
+    }
+
+    function getRoomCategoryLabel(room) {
+        return getRoomCategory(room) === 'study-room' ? 'Study room' : 'Classroom';
+    }
+
+    function createNavigationKey(...parts) {
+        return parts.map(part => normalizeText(part)).filter(Boolean).join('|');
+    }
+
+    async function getRoomNavigationIndex() {
+        if (!roomNavigationIndexPromise) {
+            roomNavigationIndexPromise = fetch(PLACES_API_URL)
+                .then(response => {
+                    if (!response.ok) throw new Error('Could not load map data for navigation.');
+                    return response.json();
+                })
+                .then(places => {
+                    const byExactKey = new Map();
+                    const byName = new Map();
+                    const byPlaceName = new Map();
+                    const placeRooms = [];
+
+                    places.forEach(place => {
+                        const placeKey = createNavigationKey(place.name);
+                        if (placeKey && !byPlaceName.has(placeKey)) {
+                            byPlaceName.set(placeKey, {
+                                placeId: place.id,
+                                placeName: place.name,
+                                roomName: place.name,
+                                buildingName: place.name,
+                                lat: place.lat,
+                                lng: place.lng
+                            });
+                        }
+
+                        (place.rooms || []).forEach(placeRoom => {
+                            const target = {
+                                placeId: place.id,
+                                placeName: place.name,
+                                roomName: placeRoom.name,
+                                buildingName: placeRoom.buildingName || place.name,
+                                lat: typeof placeRoom.lat === 'number' ? placeRoom.lat : place.lat,
+                                lng: typeof placeRoom.lng === 'number' ? placeRoom.lng : place.lng,
+                                source: placeRoom.source || place.source || '',
+                                mapsUrl: placeRoom.mapsUrl || place.mapsUrl || ''
+                            };
+
+                            const exactKey = createNavigationKey(placeRoom.name, placeRoom.buildingName || place.name);
+                            const nameKey = createNavigationKey(placeRoom.name);
+
+                            if (exactKey && !byExactKey.has(exactKey)) byExactKey.set(exactKey, target);
+                            if (nameKey && !byName.has(nameKey)) byName.set(nameKey, target);
+                            placeRooms.push({
+                                name: placeRoom.name,
+                                campus: placeRoom.buildingName || place.name,
+                                roomNumber: placeRoom.name,
+                                source: placeRoom.source || place.source || '',
+                                mapsUrl: placeRoom.mapsUrl || place.mapsUrl || '',
+                                navigationTarget: target
+                            });
+                        });
+                    });
+
+                    return { byExactKey, byName, byPlaceName, placeRooms };
+                })
+                .catch(error => {
+                    console.error(error);
+                    return { byExactKey: new Map(), byName: new Map(), byPlaceName: new Map(), placeRooms: [] };
+                });
+        }
+
+        return roomNavigationIndexPromise;
+    }
+
+    function getRoomNavigationTarget(room, navigationIndex) {
+        const exactKey = createNavigationKey(room.name, room.campus);
+        return navigationIndex.byExactKey.get(exactKey)
+            || navigationIndex.byName.get(createNavigationKey(room.name))
+            || navigationIndex.byPlaceName.get(createNavigationKey(room.campus))
+            || null;
+    }
+
+    function getRoomNavigateUrl(room) {
+        if (!room.navigationTarget) return '#';
+        const params = new URLSearchParams({
+            place: room.navigationTarget.placeId,
+            room: room.navigationTarget.roomName || room.name,
+            autoNavigate: '1',
+            lat: String(room.navigationTarget.lat),
+            lng: String(room.navigationTarget.lng)
+        });
+        return `karta.html?${params.toString()}`;
+    }
+
+    function buildMissingStudyRoomsFromPlaces(navigationIndex, existingRooms) {
+        const existingNames = new Set(existingRooms.map(room => normalizeText(room.name)));
+
+        return (navigationIndex.placeRooms || [])
+            .filter(placeRoom => {
+                const normalizedName = normalizeText(placeRoom.name);
+                return studyRoomNames.has(normalizedName)
+                    && !existingNames.has(normalizedName)
+                    && !isExcludedCampus(placeRoom.campus);
+            })
+            .map(placeRoom => ({
+                name: placeRoom.name,
+                campus: placeRoom.campus,
+                roomNumber: placeRoom.roomNumber,
+                type: 'study-room',
+                availableNow: false,
+                currentBooking: null,
+                nextBooking: null,
+                timeEditUrl: placeRoom.source || placeRoom.mapsUrl || '#',
+                navigationTarget: placeRoom.navigationTarget,
+                isScheduleFallback: true
+            }));
+    }
+
+    function isExcludedCampus(campus) {
+        const normalized = normalizeText(campus);
+        return normalized.includes('kista') || normalized.includes('sodertalje');
+    }
+
+    function getCampusOptions(rooms) {
+        return [...new Set(
+            rooms
+                .map(room => String(room.campus || '').trim())
+                .filter(campus => campus && !isExcludedCampus(campus))
+        )].sort((a, b) => a.localeCompare(b, 'sv'));
+    }
+
+    function renderCustomSelect(selectElement, menuElement, valueElement) {
+        const options = [...selectElement.options];
+        const currentValue = selectElement.value;
+        const currentOption = options.find(option => option.value === currentValue) || options[0];
+
+        valueElement.textContent = currentOption ? currentOption.textContent : '';
+        menuElement.innerHTML = options.map(option => `
+            <button
+                class="select-option${option.value === currentValue ? ' active' : ''}"
+                type="button"
+                role="option"
+                data-value="${escapeHtml(option.value)}"
+                aria-selected="${option.value === currentValue ? 'true' : 'false'}"
+            >
+                <span>${escapeHtml(option.textContent || '')}</span>
+            </button>
+        `).join('');
+    }
+
+    function closeCustomSelect(wrapper, button, menu) {
+        wrapper.classList.remove('open');
+        button.setAttribute('aria-expanded', 'false');
+        menu.hidden = true;
+    }
+
+    function openCustomSelect(wrapper, button, menu) {
+        wrapper.classList.add('open');
+        button.setAttribute('aria-expanded', 'true');
+        menu.hidden = false;
+    }
+
+    function toggleCustomSelect(wrapper, button, menu) {
+        if (wrapper.classList.contains('open')) {
+            closeCustomSelect(wrapper, button, menu);
+            return;
+        }
+
+        closeCustomSelect(campusSelect, campusSelectButton, campusSelectMenu);
+        closeCustomSelect(roomTypeSelect, roomTypeSelectButton, roomTypeSelectMenu);
+        openCustomSelect(wrapper, button, menu);
+    }
+
+    function updateCampusOptions() {
+        const currentValue = campusFilter.value;
+        const options = getCampusOptions(allRooms);
+
+        campusFilter.innerHTML = [
+            '<option value="all">Choose</option>',
+            ...options.map(campus => `<option value="${escapeHtml(campus)}">${escapeHtml(campus)}</option>`)
+        ].join('');
+
+        campusFilter.value = options.includes(currentValue) ? currentValue : 'all';
+        renderCustomSelect(campusFilter, campusSelectMenu, campusSelectValue);
+    }
+
+    function getRoomStatusLabel(room) {
+        if (room.availableNow) {
+            return {
+                state: 'free',
+                label: 'Available now',
+                detail: room.nextBooking
+                    ? `Next booking ${formatClock(room.nextBooking.start)}-${formatClock(room.nextBooking.end)}`
+                    : 'No more bookings today'
+            };
+        }
+
+        return {
+            state: 'booked',
+            label: room.currentBooking
+                ? `Booked until ${formatClock(room.currentBooking.end)}`
+                : 'Booked',
+            detail: room.currentBooking
+                ? `Booked ${formatClock(room.currentBooking.start)}-${formatClock(room.currentBooking.end)}`
+                : 'Ongoing booking'
+        };
+    }
+
+    function matchesSearch(room, query) {
+        if (!query) return true;
+        const text = normalizeText([
+            room.name,
+            room.campus,
+            room.roomNumber,
+            room.type,
+            room.availableNow ? 'available' : 'booked',
+            room.nextBooking ? room.nextBooking.start : '',
+            room.nextBooking ? room.nextBooking.end : ''
+        ].join(' '));
+        return text.includes(query);
+    }
+
+    function getBaseFilteredRooms() {
+        const campusValue = campusFilter.value;
+        const roomTypeValue = roomTypeFilter.value;
+
+        return allRooms.filter(room => {
+            const campusMatch = campusValue === 'all' || room.campus === campusValue;
+            const roomTypeMatch = roomTypeValue === 'all' || getRoomCategory(room) === roomTypeValue;
+            return campusMatch && roomTypeMatch;
+        });
+    }
+
+    function getVisibleRooms() {
+        const query = normalizeText(roomSearch.value);
+
+        return getBaseFilteredRooms().filter(room => {
+            const statusMatch = query ? true : (activeFilter === 'all' || room.availableNow);
+            return statusMatch && matchesSearch(room, query);
+        });
+    }
+
+    function getSearchSuggestionRooms() {
+        const query = normalizeText(roomSearch.value);
+        if (!query) return [];
+
+        return getBaseFilteredRooms()
+            .filter(room => matchesSearch(room, query))
+            .sort((a, b) => {
+                const aStarts = normalizeText(a.name).startsWith(query) ? 0 : 1;
+                const bStarts = normalizeText(b.name).startsWith(query) ? 0 : 1;
+                if (aStarts !== bStarts) return aStarts - bStarts;
+                return (a.name || '').localeCompare(b.name || '', 'sv', { numeric: true });
+            })
+            .slice(0, 10);
+    }
+
+    function hideSearchSuggestions() {
+        roomSearchResults.classList.remove('show');
+        roomSearchResults.innerHTML = '';
+        roomSearchBox.classList.remove('active');
+    }
+
+    function renderSearchSuggestions() {
+        const query = roomSearch.value.trim();
+        roomSearchClear.hidden = !query;
+
+        if (!query) {
+            hideSearchSuggestions();
+            return;
+        }
+
+        const matches = getSearchSuggestionRooms();
+        roomSearchBox.classList.add('active');
+
+        if (!matches.length) {
+            roomSearchResults.innerHTML = '<div class="room-search-result muted">No rooms found</div>';
+            roomSearchResults.classList.add('show');
+            return;
+        }
+
+        roomSearchResults.innerHTML = matches.map(room => {
+            const status = getRoomStatusLabel(room);
+            return `
+                <button class="room-search-result" type="button" data-room-name="${escapeHtml(room.name)}">
+                    <strong>${escapeHtml(room.name)}</strong>
+                    <span>${escapeHtml(room.campus || 'Unknown campus')} | ${escapeHtml(getRoomCategoryLabel(room))} | ${escapeHtml(status.label)}</span>
+                </button>
+            `;
+        }).join('');
+        roomSearchResults.classList.add('show');
+    }
+
+    function updateSummary(visibleRooms) {
+        const freeCount = allRooms.filter(room => room.availableNow).length;
+        const query = normalizeText(roomSearch.value);
+
+        visibleCount.textContent = String(visibleRooms.length);
+        summaryLabel.textContent = query
+            ? `${allRooms.length} rooms loaded, ${visibleRooms.length} search matches`
+            : activeFilter === 'free'
+                ? `${freeCount} available now, ${visibleRooms.length} shown`
+                : `${allRooms.length} rooms found, ${visibleRooms.length} shown`;
+    }
+
+    function renderRooms() {
+        const visibleRooms = getVisibleRooms();
+        updateSummary(visibleRooms);
+
+        if (!visibleRooms.length) {
+            roomsGrid.innerHTML = `
+                <div class="empty-state">
+                    <strong>No rooms match the filters</strong>
+                    <span>Try another campus, another room type, or show all rooms.</span>
+                </div>
+            `;
+            return;
+        }
+
+        roomsGrid.innerHTML = visibleRooms.map(room => {
+            const status = getRoomStatusLabel(room);
+            return `
+                <article class="room-card ${status.state}">
+                    <div class="room-card-top">
+                        <div class="room-card-row">
+                            <div class="room-card-badges">
+                                <span class="building-badge">${escapeHtml(room.campus || 'Unknown campus')}</span>
+                                <span class="room-type-badge ${escapeHtml(getRoomCategory(room))}">${escapeHtml(getRoomCategoryLabel(room))}</span>
+                            </div>
+                            <span class="status-pill ${status.state}">
+                                ${status.state === 'free' ? 'Available' : 'Booked'}
+                            </span>
+                        </div>
+                        <h2>${escapeHtml(room.name)}</h2>
+                    </div>
+
+                    <p class="room-status-text">${escapeHtml(status.label)}</p>
+                    <p class="room-detail">${escapeHtml(status.detail)}</p>
+
+                    <div class="room-actions">
+                        <a class="room-link" href="${escapeHtml(room.timeEditUrl || '#')}" target="_blank" rel="noreferrer">
+                            Open in TimeEdit
+                        </a>
+                        ${room.navigationTarget ? `
+                            <a class="room-link room-link-secondary" href="${escapeHtml(getRoomNavigateUrl(room))}">
+                                Navigate
+                            </a>
+                        ` : ''}
+                    </div>
+                </article>
+            `;
+        }).join('');
+    }
+
+    async function fetchRooms() {
+        const response = await fetch(ROOMS_API_URL);
+        if (!response.ok) {
+            const errorText = await response.text();
+            throw new Error(errorText || `API returned ${response.status}`);
+        }
+
+        const rooms = await response.json();
+        return rooms
+            .filter(room => !isExcludedCampus(room.campus))
+            .sort((a, b) => {
+                if (a.availableNow !== b.availableNow) return a.availableNow ? -1 : 1;
+                if ((a.campus || '') !== (b.campus || '')) return (a.campus || '').localeCompare(b.campus || '', 'sv');
+                return (a.name || '').localeCompare(b.name || '', 'sv', { numeric: true });
+            });
+    }
+
+    async function loadRooms() {
+        try {
+            const [rooms, navigationIndex] = await Promise.all([
+                fetchRooms(),
+                getRoomNavigationIndex()
+            ]);
+            const liveRooms = rooms.map(room => ({
+                ...room,
+                navigationTarget: getRoomNavigationTarget(room, navigationIndex)
+            }));
+            const fallbackRooms = buildMissingStudyRoomsFromPlaces(navigationIndex, liveRooms);
+            allRooms = [...liveRooms, ...fallbackRooms]
+                .filter(room => !isExcludedCampus(room.campus))
+                .sort((a, b) => {
+                    if (a.availableNow !== b.availableNow) return a.availableNow ? -1 : 1;
+                    if ((a.campus || '') !== (b.campus || '')) return (a.campus || '').localeCompare(b.campus || '', 'sv');
+                    return (a.name || '').localeCompare(b.name || '', 'sv', { numeric: true });
+                });
+            updateCampusOptions();
+            renderRooms();
+            renderSearchSuggestions();
+
+            const timestamp = new Date().toLocaleTimeString('sv-SE', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            statusMessage.textContent = `Updated from TimeEdit ${timestamp}. Auto-refreshing every 30 seconds.`;
+        } catch (error) {
+            statusMessage.textContent = 'Could not load TimeEdit rooms. Start the backend with: python backend/api.py';
+            roomsGrid.innerHTML = `
+                <div class="empty-state error">
+                    <strong>TimeEdit could not be loaded</strong>
+                    <span>${escapeHtml(error.message)}</span>
+                </div>
+            `;
+            visibleCount.textContent = '0';
+            summaryLabel.textContent = 'no rooms could be shown';
+            hideSearchSuggestions();
+        }
+    }
+
+    filterTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            activeFilter = tab.dataset.filter;
+            filterTabs.forEach(item => item.classList.toggle('active', item === tab));
+            renderRooms();
+            renderSearchSuggestions();
+        });
+    });
+
+    roomSearch.addEventListener('input', () => {
+        renderSearchSuggestions();
+        renderRooms();
+    });
+    roomSearch.addEventListener('focus', renderSearchSuggestions);
+    roomSearch.addEventListener('keydown', event => {
+        if (event.key === 'Enter') {
+            event.preventDefault();
+            hideSearchSuggestions();
+            renderRooms();
+        }
+    });
+    roomSearchClear.addEventListener('click', () => {
+        roomSearch.value = '';
+        renderRooms();
+        hideSearchSuggestions();
+        roomSearch.focus();
+    });
+    roomSearchButton.addEventListener('click', () => {
+        hideSearchSuggestions();
+        renderRooms();
+    });
+    roomSearchResults.addEventListener('click', event => {
+        const item = event.target.closest('.room-search-result[data-room-name]');
+        if (!item) return;
+        roomSearch.value = item.dataset.roomName;
+        hideSearchSuggestions();
+        renderRooms();
+        roomSearch.focus();
+    });
+
+    campusSelectButton.addEventListener('click', () => {
+        toggleCustomSelect(campusSelect, campusSelectButton, campusSelectMenu);
+    });
+    roomTypeSelectButton.addEventListener('click', () => {
+        toggleCustomSelect(roomTypeSelect, roomTypeSelectButton, roomTypeSelectMenu);
+    });
+
+    campusSelectMenu.addEventListener('click', event => {
+        const option = event.target.closest('.select-option');
+        if (!option) return;
+        campusFilter.value = option.dataset.value;
+        renderCustomSelect(campusFilter, campusSelectMenu, campusSelectValue);
+        closeCustomSelect(campusSelect, campusSelectButton, campusSelectMenu);
+        renderRooms();
+        renderSearchSuggestions();
+    });
+
+    roomTypeSelectMenu.addEventListener('click', event => {
+        const option = event.target.closest('.select-option');
+        if (!option) return;
+        roomTypeFilter.value = option.dataset.value;
+        renderCustomSelect(roomTypeFilter, roomTypeSelectMenu, roomTypeSelectValue);
+        closeCustomSelect(roomTypeSelect, roomTypeSelectButton, roomTypeSelectMenu);
+        renderRooms();
+        renderSearchSuggestions();
+    });
+
+    document.addEventListener('click', event => {
+        if (!campusSelect.contains(event.target)) {
+            closeCustomSelect(campusSelect, campusSelectButton, campusSelectMenu);
+        }
+        if (!roomTypeSelect.contains(event.target)) {
+            closeCustomSelect(roomTypeSelect, roomTypeSelectButton, roomTypeSelectMenu);
+        }
+        if (!roomSearchBox.contains(event.target)) {
+            hideSearchSuggestions();
+        }
+    });
+
+    document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') {
+            closeCustomSelect(campusSelect, campusSelectButton, campusSelectMenu);
+            closeCustomSelect(roomTypeSelect, roomTypeSelectButton, roomTypeSelectMenu);
+            hideSearchSuggestions();
+        }
+    });
+
+    renderCustomSelect(roomTypeFilter, roomTypeSelectMenu, roomTypeSelectValue);
+
+    loadRooms();
+    refreshTimer = window.setInterval(loadRooms, 30000);
+</script>
 
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
